@@ -1117,6 +1117,21 @@ class DoorPilotApp {
       return;
     }
 
+    // ── Known locations: if GPS lands within 1km of these, show the correct name ──
+    const KNOWN_PLACES = [
+      {
+        name: 'Nagarjuna College of Engineering and Technology',
+        address: 'Mudugurki, Venkatagirikote Post, Devanahalli, Bengaluru, Karnataka',
+        lat: 13.2916, lng: 77.6768, radiusKm: 1.0
+      }
+    ];
+
+    const haversineKm = (lat1, lng1, lat2, lng2) => {
+      const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLng = (lng2 - lng1) * Math.PI / 180;
+      const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         modalLat = pos.coords.latitude;
@@ -1226,6 +1241,16 @@ class DoorPilotApp {
               document.getElementById('loc-modal-address').textContent = d2.address;
             }
           } catch { /* silent */ }
+        }
+
+        // ── Override with known place if within radius ──────────────────
+        const nearby = KNOWN_PLACES.find(p => haversineKm(modalLat, modalLng, p.lat, p.lng) <= p.radiusKm);
+        if (nearby) {
+          document.getElementById('loc-place-name').textContent = nearby.name;
+          document.getElementById('loc-modal-address').textContent = nearby.address;
+          if (myMarker) myMarker.bindPopup(`<b>${nearby.name}</b><br><small>${nearby.address}</small>`, {
+            offset: [0, -12], closeButton: false
+          }).openPopup();
         }
       },
       (err) => {
