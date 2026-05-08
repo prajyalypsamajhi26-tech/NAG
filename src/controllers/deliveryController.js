@@ -10,6 +10,7 @@ exports.sendNearMeNotification = async (req, res) => {
 
     const msg = `DoorPilot 🛵: Your delivery partner is almost at your door! Please be ready.`;
     try { await smsGateway.sendSMS(order.customerPhone, msg); } catch {}
+    try { await smsGateway.makeCall(order.customerPhone, msg); } catch {}
 
     trackingDb.add({ orderId, deliveryExecutiveId, event: 'near_me', timestamp: new Date() });
 
@@ -33,6 +34,7 @@ exports.sendWrongDoorNotification = async (req, res) => {
 
     const msg = `DoorPilot 🛵: Your delivery partner is at the wrong location. Please re-share your exact location or call them.`;
     try { await smsGateway.sendSMS(order.customerPhone, msg); } catch {}
+    try { await smsGateway.makeCall(order.customerPhone, msg); } catch {}
 
     trackingDb.add({ orderId, deliveryExecutiveId, event: 'wrong_door', timestamp: new Date() });
 

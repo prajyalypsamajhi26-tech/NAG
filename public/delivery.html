@@ -243,25 +243,46 @@ function renderOrder(data) {
     .bindPopup(`<b>📍 ${data.customerName || 'Customer'}</b>`)
     .openPopup();
 
-  // My location
+  // My location - Real time tracking
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
+    let myMarker = null;
+    let myLine = null;
+    
+    navigator.geolocation.watchPosition(pos => {
       const { latitude: myLat, longitude: myLng } = pos.coords;
-      const myIcon = L.divIcon({
-        className: '',
-        html: `<div style="width:16px;height:16px;background:#4285F4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(66,133,244,.3)"></div>`,
-        iconSize:[16,16], iconAnchor:[8,8]
-      });
-      L.marker([myLat, myLng], { icon: myIcon }).addTo(map).bindPopup('📍 You');
-
-      // Draw dashed line between me and customer
-      L.polyline([[myLat, myLng],[customerLat, customerLng]], {
-        color: '#FFB800', weight: 2, dashArray: '8 6', opacity: 0.8
-      }).addTo(map);
-
-      // Fit both in view
-      map.fitBounds([[customerLat, customerLng],[myLat, myLng]], { padding: [40,40] });
-    }, () => {});
+      
+      // Update map marker
+      if (!myMarker) {
+        const myIcon = L.divIcon({
+          className: '',
+          html: `<div style="width:16px;height:16px;background:#4285F4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 4px rgba(66,133,244,.3)"></div>`,
+          iconSize:[16,16], iconAnchor:[8,8]
+        });
+        myMarker = L.marker([myLat, myLng], { icon: myIcon }).addTo(map).bindPopup('📍 You');
+        
+        myLine = L.polyline([[myLat, myLng],[customerLat, customerLng]], {
+          color: '#FFB800', weight: 2, dashArray: '8 6', opacity: 0.8
+        }).addTo(map);
+        
+        map.fitBounds([[customerLat, customerLng],[myLat, myLng]], { padding: [40,40] });
+      } else {
+        myMarker.setLatLng([myLat, myLng]);
+        myLine.setLatLngs([[myLat, myLng],[customerLat, customerLng]]);
+      }
+      
+      // Send real-time location to backend
+      fetch('/api/delivery/update-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          orderId: orderData?.orderId || orderId, 
+          deliveryExecutiveId: 'exec-delivery', 
+          latitude: myLat, 
+          longitude: myLng 
+        })
+      }).catch(err => console.error('Error sending location:', err));
+      
+    }, err => console.warn('Geolocation error:', err), { enableHighAccuracy: true });
   }
 
   setTimeout(() => map.invalidateSize(), 300);

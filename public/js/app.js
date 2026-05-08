@@ -389,22 +389,26 @@ class DoorPilotApp {
     ];
     const CHECKBOX_IDS = ['has-lift', 'is-left-side'];
 
-    const _collectFormData = () => ({
-      apartmentName:     document.getElementById('apartment-name').value,
-      colonyName:        document.getElementById('colony-name').value,
-      flatNumber:        document.getElementById('flat-number').value,
-      houseNumber:       document.getElementById('house-number').value,
-      flatColor:         document.getElementById('flat-color').value,
-      gateNumber:        document.getElementById('gate-number').value,
-      staircaseColor:    document.getElementById('staircase-color').value,
-      hasLift:           document.getElementById('has-lift').checked,
-      isLeftSide:        document.getElementById('is-left-side').checked,
-      floorNumber:       document.getElementById('floor-number').value,
-      intercomCode:      document.getElementById('intercom-code').value,
-      specialIdentifiers:document.getElementById('special-identifiers').value,
-      customerName:      document.getElementById('customer-name').value,
-      customerPhone:     document.getElementById('customer-phone').value,
-    });
+    const _collectFormData = () => {
+      const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
+      return {
+        apartmentName:     getVal('apartment-name'),
+        colonyName:        getVal('colony-name'),
+        flatNumber:        getVal('flat-number'),
+        houseNumber:       getVal('house-number'),
+        flatColor:         getVal('flat-color'),
+        gateNumber:        getVal('gate-number'),
+        staircaseColor:    getVal('staircase-color'),
+        hasLift:           getChk('has-lift'),
+        isLeftSide:        getChk('is-left-side'),
+        floorNumber:       getVal('floor-number'),
+        intercomCode:      getVal('intercom-code'),
+        specialIdentifiers:getVal('special-identifiers'),
+        customerName:      getVal('customer-name'),
+        customerPhone:     getVal('customer-phone'),
+      };
+    };
 
     const _autoSave = () => {
       const data = _collectFormData();
@@ -649,8 +653,8 @@ class DoorPilotApp {
   async simulateDeliveryAssignment() {
     // Simulate finding a delivery executive
     try {
-      // In production, backend would find available executives
-      const deliveryExecutivePhone = '+919876543210'; // Simulated
+      // For demonstration, we'll assign the delivery to the phone number the user entered
+      const deliveryExecutivePhone = this.orderData.customerPhone || '+919876543210';
       const deliveryExecutiveId = 'exec-' + Math.random().toString(36).substr(2, 9);
 
       const result = await api.assignDeliveryExecutive(
@@ -684,52 +688,27 @@ class DoorPilotApp {
   startTracking() {
     document.getElementById('delivery-phone').textContent = this.currentDeliveryExecutivePhone || 'Contacting...';
 
-    // Simulate delivery executive location updates
-    this.simulateDeliveryTracking();
+    // Initialize real map for delivery executive location updates
+    this.initializeRealTracking();
   }
 
-  simulateDeliveryTracking() {
-    if (!this.currentPage === 'tracking') return;
-
+  initializeRealTracking() {
     setTimeout(() => {
-      // Simulate location updates every 3 seconds
-      const trackingMap = L.map('tracking-map').setView([28.6139, 77.2090], 15);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(trackingMap);
+      if (this.trackingMap) {
+        this.trackingMap.remove();
+      }
+      const mapEl = document.getElementById('tracking-map');
+      mapEl.innerHTML = '';
+      
+      const customerLat = this.orderData.mapPin.latitude || 28.6139;
+      const customerLng = this.orderData.mapPin.longitude || 77.2090;
 
-      const customerLocation = [this.orderData.mapPin.latitude || 28.6139, this.orderData.mapPin.longitude || 77.2090];
-      L.marker(customerLocation, { title: 'Your Location' }).addTo(trackingMap);
-
-      let execLat = customerLocation[0] + 0.01;
-      let execLng = customerLocation[1] + 0.01;
-      let execMarker = L.marker([execLat, execLng], {
-        icon: L.icon({
-          iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 40" width="30" height="40"><path fill="%23FF6B6B" d="M15 0C9 0 4 5 4 12c0 8 11 28 11 28s11-20 11-28c0-7-5-12-11-12z"/></svg>',
-          iconSize: [30, 40]
-        })
-      }).addTo(trackingMap);
-
-      // Animate marker towards customer
-      const interval = setInterval(() => {
-        if (!this.currentPage === 'tracking') {
-          clearInterval(interval);
-          return;
-        }
-
-        execLat += (customerLocation[0] - execLat) * 0.1;
-        execLng += (customerLocation[1] - execLng) * 0.1;
-
-        execMarker.setLatLng([execLat, execLng]);
-
-        const distance = Math.sqrt(
-          Math.pow(customerLocation[0] - execLat, 2) +
-          Math.pow(customerLocation[1] - execLng, 2)
-        );
-
-        if (distance < 0.001) {
-          clearInterval(interval);
-          this.showDeliveryArrivalOptions();
-        }
-      }, 1000);
+      this.trackingMap = L.map('tracking-map').setView([customerLat, customerLng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.trackingMap);
+      
+      L.marker([customerLat, customerLng], { title: 'Your Location' }).addTo(this.trackingMap);
+      
+      this.deliveryMarkers = {}; // Reset markers
     }, 500);
   }
 
@@ -741,10 +720,38 @@ class DoorPilotApp {
 
   updateDeliveryLocation(data) {
     if (data.orderId !== this.currentOrderId) return;
+    
+    if (!this.trackingMap) return;
 
-    // Update marker position on map
-    if (this.deliveryMarkers[data.deliveryExecutiveId]) {
-      this.deliveryMarkers[data.deliveryExecutiveId].setLatLng([data.latitude, data.longitude]);
+    const execLat = parseFloat(data.latitude);
+    const execLng = parseFloat(data.longitude);
+
+    if (!this.deliveryMarkers[data.deliveryExecutiveId]) {
+      // Create new marker for this executive
+      const execMarker = L.marker([execLat, execLng], {
+        icon: L.icon({
+          iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 40" width="30" height="40"><path fill="%23FF6B6B" d="M15 0C9 0 4 5 4 12c0 8 11 28 11 28s11-20 11-28c0-7-5-12-11-12z"/></svg>',
+          iconSize: [30, 40]
+        })
+      }).addTo(this.trackingMap);
+      
+      this.deliveryMarkers[data.deliveryExecutiveId] = execMarker;
+      
+      // Fit bounds to show both customer and delivery partner
+      const customerLat = this.orderData.mapPin.latitude || 28.6139;
+      const customerLng = this.orderData.mapPin.longitude || 77.2090;
+      this.trackingMap.fitBounds([[customerLat, customerLng], [execLat, execLng]], { padding: [40,40] });
+    } else {
+      // Update existing marker position
+      this.deliveryMarkers[data.deliveryExecutiveId].setLatLng([execLat, execLng]);
+    }
+    
+    // Check arrival distance (roughly 100 meters)
+    const customerLat = this.orderData.mapPin.latitude || 28.6139;
+    const customerLng = this.orderData.mapPin.longitude || 77.2090;
+    const distance = Math.sqrt(Math.pow(customerLat - execLat, 2) + Math.pow(customerLng - execLng, 2));
+    if (distance < 0.001) {
+      this.showDeliveryArrivalOptions();
     }
   }
 
