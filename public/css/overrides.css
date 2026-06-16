@@ -718,3 +718,12 @@ body, #app, .page,
   transform: translateY(-2px) !important;
   box-shadow: 0 10px 28px rgba(255,184,0,0.45) !important;
 }
+
+/* Tab active state — use ::after underline from animations.css */
+.zp-cat-tile        { border-bottom: 3px solid transparent !important; }
+.zp-cat-tile.active { border-bottom: 3px solid #FFB800 !important; }
+
+/* Hide header on map, voice, and review pages */
+body.page-map .app-header,
+body.page-voice .app-header,
+body.page-review .app-header { display: none !important; }

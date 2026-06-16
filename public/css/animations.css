@@ -1,78 +1,343 @@
-/* ── Slide in from bottom ───────────────────────────────────────────────── */
-@keyframes slideInFromBottom {
-  from { opacity: 0; transform: translateY(20px); }
+/* ==================== DOORPILOT ANIMATIONS ==================== */
+
+/* ── Core keyframes ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-/* ── Slide in from right ────────────────────────────────────────────────── */
-@keyframes slideInFromRight {
-  from { opacity: 0; transform: translateX(20px); }
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
-/* ── Map marker pulse ───────────────────────────────────────────────────── */
-@keyframes markerPulse {
-  0%,100% { transform: scale(1); opacity: 1; }
-  50%      { transform: scale(1.3); opacity: .7; }
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-
-/* ── Button press ───────────────────────────────────────────────────────── */
-.btn:active:not(:disabled) { transform: scale(.98) !important; }
-
-/* ── Smooth transitions ─────────────────────────────────────────────────── */
-button, a, input, textarea { transition: all .18s ease; }
-
-/* ── Road scroll (landing animation) ───────────────────────────────────── */
-@keyframes roadScroll {
-  from { background-position: 0 0; }
-  to   { background-position: -56px 0; }
-}
-
-/* ── Scooter ride ───────────────────────────────────────────────────────── */
-@keyframes rideAcross {
-  0%   { left: -220px; }
-  100% { left: calc(100% + 20px); }
-}
-@keyframes wheelSpin {
-  to { transform: rotate(360deg); }
-}
-@keyframes rideBounce {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-4px); }
-}
-
-/* ── Pin drop ───────────────────────────────────────────────────────────── */
-@keyframes pinDrop {
-  0%,10% { opacity: 0; transform: translateY(-20px); }
-  50%    { opacity: 1; }
-  100%   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Spin ───────────────────────────────────────────────────────────────── */
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Fade up ────────────────────────────────────────────────────────────── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* ── Scale up ───────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .55; }
+}
 @keyframes scaleUp {
   0%   { transform: scale(0); opacity: 0; }
   60%  { transform: scale(1.1); }
   100% { transform: scale(1); opacity: 1; }
 }
-
-/* ── Pulse ──────────────────────────────────────────────────────────────── */
-@keyframes pulse {
-  0%,100% { opacity: 1; }
-  50%      { opacity: .6; }
-}
-
-/* ── Record pulse ───────────────────────────────────────────────────────── */
 @keyframes recordPulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  50%      { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+}
+@keyframes markerPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.3); opacity: .7; }
+}
+
+/* ── Landing title bounce ───────────────────────────────────── */
+@keyframes titleBounce {
+  0%   { transform: translateY(-80px) scale(0.8); opacity: 0; }
+  55%  { transform: translateY(14px)  scale(1.02); opacity: 1; }
+  72%  { transform: translateY(-8px)  scale(0.99); }
+  85%  { transform: translateY(5px)   scale(1.005); }
+  93%  { transform: translateY(-3px); }
+  100% { transform: translateY(0)     scale(1); opacity: 1; }
+}
+
+/* ── Subtitle fade ──────────────────────────────────────────── */
+@keyframes subtitleFade {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Page transition ────────────────────────────────────────── */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header slide down ──────────────────────────────────────── */
+@keyframes headerSlideDown {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cart bar slide up ──────────────────────────────────────── */
+@keyframes cartSlideUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Add-to-cart pop ────────────────────────────────────────── */
+@keyframes addPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.18); }
+  65%  { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+
+/* ── Card shimmer (skeleton loader) ────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+/* ── Stagger fade for product cards ────────────────────────── */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ── Yellow underline grow (tab active) ─────────────────────── */
+@keyframes underlineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ── Count badge pop ────────────────────────────────────────── */
+@keyframes badgePop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* ── Soft glow pulse (cart bar when items added) ────────────── */
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 -4px 24px rgba(255,184,0,0.25); }
+  50%      { box-shadow: 0 -4px 32px rgba(255,184,0,0.55); }
+}
+
+
+/* ==================== APPLY ANIMATIONS ==================== */
+
+/* Page enter */
+.page:not(.hidden) {
+  animation: pageEnter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Header */
+.app-header {
+  animation: headerSlideDown 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Landing title */
+.landing-title {
+  animation: titleBounce 0.75s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Landing subtitle */
+.landing-subtitle {
+  animation: subtitleFade 0.6s ease 0.55s both;
+}
+
+/* Category tabs fade in */
+.zp-cats-wrap {
+  animation: fadeDown 0.35s ease 0.1s both;
+}
+
+/* Page heading */
+.zp-page-heading {
+  animation: fadeUp 0.35s ease 0.05s both;
+}
+
+/* Product cards — stagger via nth-child */
+.product-card {
+  animation: cardReveal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: calc(var(--card-index, 0) * 40ms);
+}
+
+/* Cart bar slide up */
+#cart-summary-bar {
+  animation: cartSlideUp 0.35s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+}
+
+/* Cart bar glow when active (has items) */
+#cart-summary-bar.has-items {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Cart count badge pop */
+.zp-cart-count.popping {
+  animation: badgePop 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ADD button pop when clicked */
+.product-add-btn.popping {
+  animation: addPop 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Qty control appear */
+.qty-control:not(.hidden) {
+  animation: scaleIn 0.2s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* Active tab underline grow */
+.zp-cat-tile.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0; right: 0;
+  height: 3px;
+  background: #FFB800;
+  border-radius: 2px 2px 0 0;
+  transform-origin: left;
+  animation: underlineGrow 0.25s ease both;
+}
+
+.zp-cat-tile {
+  position: relative;
+  border-bottom: none !important; /* handled by ::after */
+}
+
+.zp-cat-tile.active {
+  border-bottom: none !important;
+}
+
+/* Form sections stagger in */
+.form-section {
+  animation: fadeUp 0.35s ease both;
+}
+
+.form-section:nth-child(1) { animation-delay: 0.05s; }
+.form-section:nth-child(2) { animation-delay: 0.10s; }
+.form-section:nth-child(3) { animation-delay: 0.15s; }
+.form-section:nth-child(4) { animation-delay: 0.20s; }
+
+/* Review sections */
+.review-section {
+  animation: slideInLeft 0.3s ease both;
+}
+.review-section:nth-child(1) { animation-delay: 0.05s; }
+.review-section:nth-child(2) { animation-delay: 0.12s; }
+.review-section:nth-child(3) { animation-delay: 0.19s; }
+
+/* Buttons */
+.btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+/* Completion checkmark */
+.checkmark {
+  animation: scaleUp 0.55s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* Processing spinner */
+.spinner, .loader {
+  animation: spin 0.85s linear infinite;
+}
+
+/* Waiting badge pulse */
+.status-badge.waiting {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Skeleton shimmer for loading cards */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 37%, #f0f0f0 63%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 10px;
+}
+
+/* Smooth page scroll */
+html { scroll-behavior: smooth; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==================== MY LOCATION PIN ==================== */
+
+@keyframes pinDrop {
+  0%   { transform: translateY(-40px) scale(0.8); opacity: 0; }
+  55%  { transform: translateY(6px)   scale(1.05); opacity: 1; }
+  75%  { transform: translateY(-4px)  scale(0.98); }
+  90%  { transform: translateY(2px)   scale(1.01); }
+  100% { transform: translateY(0)     scale(1);    opacity: 1; }
+}
+
+@keyframes pinBob {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-5px); }
+}
+
+@keyframes shadowPulse {
+  0%,100% { transform: scaleX(1);   opacity: 0.35; }
+  50%     { transform: scaleX(0.7); opacity: 0.18; }
+}
+
+.my-location-pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 44px;
+  animation: pinDrop 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.my-pin-body {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(145deg, #FFD440, #FFB800);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 14px rgba(255, 184, 0, 0.55),
+    0 2px 4px rgba(0,0,0,0.18);
+  border: 2.5px solid #e6a000;
+  animation: pinBob 2.2s ease-in-out 0.7s infinite;
+  flex-shrink: 0;
+}
+
+.my-pin-body svg {
+  transform: rotate(45deg); /* counter-rotate to keep icon upright */
+  flex-shrink: 0;
+}
+
+.my-pin-tip {
+  width: 2px;
+  height: 8px;
+  background: #e6a000;
+  border-radius: 0 0 2px 2px;
+  flex-shrink: 0;
+}
+
+.my-pin-shadow {
+  width: 14px;
+  height: 5px;
+  background: rgba(0,0,0,0.22);
+  border-radius: 50%;
+  margin-top: 1px;
+  animation: shadowPulse 2.2s ease-in-out 0.7s infinite;
 }

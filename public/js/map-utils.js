@@ -53,16 +53,28 @@ class MapManager {
     this.selectedLatitude  = lat;
     this.selectedLongitude = lng;
 
+    // Cute animated "my location" pin — yellow pin with a person silhouette
+    const pinHtml = `
+      <div class="my-location-pin">
+        <div class="my-pin-body">
+          <!-- Person icon inside pin -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="7" r="4" fill="white"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="my-pin-tip"></div>
+        <div class="my-pin-shadow"></div>
+      </div>
+    `;
+
     this.marker = L.marker([lat, lng], {
       icon: L.divIcon({
         className: '',
-        html: `<div style="
-          width:36px;height:44px;
-          background:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 36 44%22><path fill=%22%23FFB800%22 stroke=%22%23c47f00%22 stroke-width=%221.5%22 d=%22M18 0C10 0 4 6 4 14c0 10 14 30 14 30s14-20 14-30C32 6 26 0 18 0z%22/><circle cx=%2218%22 cy=%2214%22 r=%226%22 fill=%22white%22/></svg>') no-repeat center/contain;
-        "></div>`,
-        iconSize: [36, 44],
-        iconAnchor: [18, 44],
-        popupAnchor: [0, -44]
+        html: pinHtml,
+        iconSize:   [44, 58],
+        iconAnchor: [22, 56],
+        popupAnchor:[0, -58]
       })
     }).addTo(this.map);
 

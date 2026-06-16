@@ -98,6 +98,11 @@ class DoorPilotApp {
       page.classList.remove('hidden');
       this.currentPage = pageName;
 
+      // Toggle body class for header visibility control
+      document.body.className = document.body.className
+        .replace(/\bpage-\S+/g, '').trim();
+      document.body.classList.add(`page-${pageName}`);
+
       // Execute page-specific logic
       this.executePageLogic(pageName);
     }
@@ -363,9 +368,12 @@ class DoorPilotApp {
       const row = document.createElement('div');
       row.className = 'product-grid';
 
+      let cardIndex = 0;
       catalog[category].forEach(item => {
         const card = document.createElement('div');
         card.className = 'product-card';
+        card.style.setProperty('--card-index', cardIndex % 12); // cap at 12 for perf
+        cardIndex++;
         card.innerHTML = `
           <div class="product-img">
             <img src="${item.img}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/200x140/f5f5f5/FFB800?text=${encodeURIComponent(item.name)}'">
@@ -388,6 +396,9 @@ class DoorPilotApp {
         // ADD button — show qty controls
         card.querySelector('.product-add-btn').addEventListener('click', (e) => {
           e.stopPropagation();
+          const btn = e.currentTarget;
+          btn.classList.add('popping');
+          setTimeout(() => btn.classList.remove('popping'), 300);
           this.addToCart(item);
           document.getElementById(`add-btn-${item.id}`).classList.add('hidden');
           document.getElementById(`qty-ctrl-${item.id}`).classList.remove('hidden');
@@ -489,7 +500,23 @@ class DoorPilotApp {
 
     // Update header cart count if present
     const headerCount = document.getElementById('header-cart-count');
-    if (headerCount) headerCount.textContent = count;
+    if (headerCount) {
+      const prev = parseInt(headerCount.textContent) || 0;
+      headerCount.textContent = count;
+      // Pop animation when count increases
+      if (count > prev) {
+        headerCount.classList.remove('popping');
+        void headerCount.offsetWidth; // reflow
+        headerCount.classList.add('popping');
+        setTimeout(() => headerCount.classList.remove('popping'), 350);
+      }
+    }
+
+    // Glow cart bar when items present
+    const cartBar = document.getElementById('cart-summary-bar');
+    if (cartBar) {
+      cartBar.classList.toggle('has-items', count > 0);
+    }
 
     // Store cart items in order data
     this.orderData.items = this.cart;
