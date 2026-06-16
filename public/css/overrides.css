@@ -219,14 +219,14 @@ body,
   width: 100% !important;
   height: 110px !important;
   overflow: hidden !important;
-  background: #f9f9f9 !important;
+  background: #ffffff !important;
   flex-shrink: 0 !important;
 }
 
 .product-img img {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important;
   display: block !important;
 }
 
