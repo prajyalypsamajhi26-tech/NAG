@@ -117,55 +117,74 @@ body {
 .landing-container {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(145deg, var(--accent) 0%, var(--accent-mid) 100%);
+  background: #ffffff;
   padding: 24px;
 }
-.landing-hero { text-align: center; color: #fff; max-width: 480px; }
-.logo-animation { margin-bottom: 28px; animation: fadeUp .8s ease; }
+.landing-hero { text-align: center; max-width: 480px; }
+.logo-animation { margin-bottom: 20px; animation: mascotFloat 3s ease-in-out infinite; }
 .doorpilot-logo { width: 140px; height: 115px; filter: drop-shadow(0 8px 24px rgba(0,0,0,.3)); }
 .doorpilot-logo .pin-drop { animation: pinDrop 1.2s ease-in-out 1.5s forwards; }
+
+/* Mascot image */
+.mascot-img {
+  width: 200px; height: auto;
+  animation: mascotBounce 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 12px 32px rgba(0,0,0,0.12));
+}
+
+/* Logo text image */
+.logo-text-img {
+  width: 280px; height: auto;
+  animation: fadeUp .7s ease .1s both;
+  margin: 0 auto 12px;
+  display: block;
+}
+
 @keyframes pinDrop {
   0%,10% { opacity:0; transform:translateY(-20px); }
   50%     { opacity:1; }
   100%    { opacity:1; transform:translateY(0); }
 }
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes mascotFloat {
+  0%, 100% { transform: translateY(0px) rotate(-1deg); }
+  50%      { transform: translateY(-10px) rotate(1deg); }
+}
 .landing-title {
   font-size: 42px; font-weight: 800; letter-spacing: -1px;
-  color: #fff; margin-bottom: 8px;
+  color: #1a1a1a; margin-bottom: 8px;
   animation: fadeUp .8s ease .1s both;
 }
 .landing-subtitle {
-  font-size: 16px; color: rgba(255,255,255,.65); font-weight: 400;
+  font-size: 16px; color: #888; font-weight: 400;
   animation: fadeUp .8s ease .2s both;
 }
 
-/* Hero scooter animation */
-.hero-animation {
-  position: relative; width: 100%; height: 200px;
-  margin: 32px auto 0; overflow: hidden;
-  border-radius: var(--radius-xl);
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.1);
+/* floating dots decoration */
+.landing-dots {
+  display: flex; justify-content: center; gap: 10px;
+  margin-top: 28px;
+  animation: fadeUp .8s ease .4s both;
 }
-.road {
-  position: absolute; left: 0; bottom: 0; width: 100%; height: 40px;
-  background: rgba(255,255,255,.05);
-  border-top: 1px solid rgba(255,255,255,.08);
+.landing-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #FFD440;
+  animation: dotPulse 1.4s ease-in-out infinite;
 }
-.road::after {
-  content: '';
-  position: absolute; top: 50%; left: 0; width: 100%; height: 3px;
-  background: repeating-linear-gradient(90deg, rgba(255,255,255,.2) 0 28px, transparent 28px 56px);
-  transform: translateY(-50%);
-  animation: roadScroll .5s linear infinite;
+.landing-dot:nth-child(2) { animation-delay: .2s; background: #FFB800; }
+.landing-dot:nth-child(3) { animation-delay: .4s; background: #F5A800; }
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.5); opacity: .5; }
 }
-@keyframes roadScroll { from { background-position: 0 0; } to { background-position: -56px 0; } }
-.scooter {
-  position: absolute; bottom: 28px; left: -220px; width: 200px; height: 155px;
-  animation: rideAcross 3s linear infinite;
-}
-.scooter .wheel-spin { transform-origin: center; animation: wheelSpin .45s linear infinite; }
-.scooter svg { animation: rideBounce .35s ease-in-out infinite alternate; }
+
+/* Hero scooter animation — hidden now */
+.hero-animation { display: none; }
+.road { display: none; }
+.scooter { display: none; }
 @keyframes rideAcross  { 0% { left: -220px; } 100% { left: calc(100% + 20px); } }
 @keyframes wheelSpin   { to { transform: rotate(360deg); } }
 @keyframes rideBounce  { from { transform: translateY(0); } to { transform: translateY(-4px); } }
