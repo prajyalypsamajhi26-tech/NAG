@@ -9,7 +9,7 @@
   
   <!-- Stylesheets -->
   <!-- Google Font: Poppins for modern UI -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fredoka+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fredoka+One&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/animations.css">
   <link rel="stylesheet" href="/css/responsive.css">
@@ -84,121 +84,20 @@
       <p>Loading DoorPilot...</p>
     </div>
 
-    <!-- Landing Page (Animation) -->
+    <!-- Landing Page -->
     <div id="landing-page" class="page hidden">
       <div class="landing-container">
         <div class="landing-hero">
 
-          <!-- Mascot: cute delivery box character SVG — matches reference image exactly -->
-          <div class="logo-animation">
-            <svg class="mascot-img" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg" width="220" height="260">
+          <!-- Big yellow DoorPilot text -->
+          <h1 class="landing-title">DoorPilot</h1>
 
-              <!-- Ground shadow -->
-              <ellipse cx="128" cy="292" rx="60" ry="9" fill="rgba(0,0,0,0.07)"/>
-
-              <!-- ── LEGS ── -->
-              <rect x="95"  y="222" width="22" height="38" rx="11" fill="#1a1a1a"/>
-              <rect x="143" y="222" width="22" height="38" rx="11" fill="#1a1a1a"/>
-              <!-- Feet (small rounded) -->
-              <ellipse cx="106" cy="260" rx="16" ry="9"  fill="#1a1a1a"/>
-              <ellipse cx="154" cy="260" rx="16" ry="9"  fill="#1a1a1a"/>
-
-              <!-- ── BOX BODY ── -->
-              <!-- Main yellow box -->
-              <rect x="55" y="100" width="150" height="130" rx="16" fill="#F5C400" stroke="#1a1a1a" stroke-width="5"/>
-              <!-- Box right-side shading panel -->
-              <rect x="175" y="100" width="30" height="130" rx="0" fill="#E0A800" stroke="none"/>
-              <rect x="190" y="100" width="15" height="130" rx="0" fill="#E0A800"/>
-              <!-- Box right border fix -->
-              <rect x="55" y="100" width="150" height="130" rx="16" fill="none" stroke="#1a1a1a" stroke-width="5"/>
-              <!-- Tape stripe horizontal -->
-              <rect x="55" y="152" width="150" height="14" fill="#E8920A"/>
-              <!-- Tape stripe vertical -->
-              <rect x="118" y="100" width="14" height="130" fill="#E8920A"/>
-              <!-- Tape cross lines (dark) -->
-              <line x1="55"  y1="159" x2="205" y2="159" stroke="#c47a00" stroke-width="1.5" opacity="0.5"/>
-              <line x1="125" y1="100" x2="125" y2="230" stroke="#c47a00" stroke-width="1.5" opacity="0.5"/>
-
-              <!-- ── FACE ── -->
-              <!-- Happy squint eyes (^-^ style arcs) -->
-              <path d="M82 140 Q92 128 102 140"  fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
-              <path d="M148 140 Q158 128 168 140" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
-              <!-- Big smile -->
-              <path d="M88 178 Q125 205 162 178" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
-              <!-- Small rosy cheeks -->
-              <ellipse cx="78"  cy="168" rx="12" ry="7" fill="#ffaaaa" opacity="0.45"/>
-              <ellipse cx="172" cy="168" rx="12" ry="7" fill="#ffaaaa" opacity="0.45"/>
-
-              <!-- ── HELMET ── -->
-              <!-- Outer black full dome — goes well down over the sides -->
-              <path d="M48 138 Q44 48 128 42 Q212 48 212 138 Q212 148 200 152 L56 152 Q44 148 48 138 Z" fill="#1a1a1a"/>
-              <!-- Inner dome shine/depth -->
-              <path d="M60 134 Q58 62 128 56 Q198 62 198 134 Z" fill="#2d2d2d"/>
-              <!-- Helmet gold centre ridge -->
-              <path d="M128 42 L128 152" stroke="#F5C400" stroke-width="4" stroke-linecap="round" opacity="0.35"/>
-              <!-- Visor slit (dark tinted strip) -->
-              <rect x="62" y="110" width="136" height="26" rx="13" fill="#111" opacity="0.85"/>
-              <!-- Visor highlight glare -->
-              <path d="M72 116 Q128 110 184 116" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.15"/>
-              <!-- Helmet lower wraparound chin guard -->
-              <path d="M56 152 Q52 160 60 166 L196 166 Q204 160 200 152 Z" fill="#1a1a1a"/>
-              <!-- Bottom edge trim (gold) -->
-              <rect x="56" y="162" width="144" height="7" rx="3.5" fill="#F5C400" opacity="0.5"/>
-
-              <!-- ── WING (right side of helmet) ── -->
-              <g transform="translate(200, 72)">
-                <!-- Wing base -->
-                <path d="M0 22 Q10 0 32 8 Q26 20 16 22 Q24 32 30 42 Q12 44 0 22 Z" fill="#F5C400" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
-                <!-- Wing inner lines -->
-                <path d="M4 22 Q14 5 28 12"  fill="none" stroke="#E8920A" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-                <path d="M4 26 Q16 24 26 34" fill="none" stroke="#E8920A" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
-              </g>
-
-              <!-- ── LEFT ARM + LOCATION PIN ── -->
-              <!-- Arm -->
-              <path d="M58 155 Q32 145 24 125" stroke="#F5C400" stroke-width="16" stroke-linecap="round" fill="none"/>
-              <path d="M58 155 Q32 145 24 125" stroke="#1a1a1a" stroke-width="3"  stroke-linecap="round" fill="none"/>
-              <!-- Pin teardrop -->
-              <path d="M24 108 Q14 92 24 80 Q34 68 44 80 Q54 92 44 108 Q34 118 24 108 Z" fill="#F5C400" stroke="#1a1a1a" stroke-width="3"/>
-              <!-- Pin inner circle -->
-              <circle cx="34" cy="90" r="7" fill="white" stroke="#1a1a1a" stroke-width="2"/>
-              <!-- Pin tip dot -->
-              <circle cx="34" cy="113" r="4" fill="#1a1a1a"/>
-
-              <!-- ── RIGHT ARM (waving back) ── -->
-              <path d="M202 155 Q226 138 228 118" stroke="#F5C400" stroke-width="16" stroke-linecap="round" fill="none"/>
-              <path d="M202 155 Q226 138 228 118" stroke="#1a1a1a" stroke-width="3"  stroke-linecap="round" fill="none"/>
-
-            </svg>
-          </div>
-
-          <!-- DoorPilot logo text SVG -->
-          <div style="animation: fadeUp .7s ease .15s both; display:block; margin-bottom:10px;">
-            <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-            <svg viewBox="0 0 380 80" xmlns="http://www.w3.org/2000/svg" width="340" height="72" style="display:block;margin:0 auto;">
-              <text x="50%" y="62" text-anchor="middle"
-                font-family="'Fredoka One', 'Nunito', 'Poppins', cursive"
-                font-size="70" font-weight="900" letter-spacing="1"
-                fill="#FFD440">DoorPilot</text>
-            </svg>
-          </div>
-
-          <!-- Subtitle -->
-          <p class="landing-subtitle" style="color:#888; font-size:15px; animation: fadeUp .8s ease .25s both;">
-            Your delivery, guided to your door 🚀
-          </p>
-
-          <!-- Animated dots -->
-          <div class="landing-dots">
-            <div class="landing-dot"></div>
-            <div class="landing-dot"></div>
-            <div class="landing-dot"></div>
-          </div>
+          <!-- One line below -->
+          <p class="landing-subtitle">Fast delivery, guided to your door</p>
 
         </div>
       </div>
     </div>
-              <!-- removed -->
 
     <!-- Order Selection Page -->
     <div id="order-page" class="page hidden">
@@ -207,6 +106,7 @@
           <h1>What can we deliver?</h1>
           <p>Select items you would like to order</p>
         </div>
+
 
         <!-- Category strip: horizontal scrollable pills -->
         <div class="categories" id="categories">
