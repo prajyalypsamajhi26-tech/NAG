@@ -7,32 +7,94 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Segoe UI',Arial,sans-serif;background:#0A2647;min-height:100vh}
-    .container{max-width:600px;margin:0 auto;background:#fff;min-height:100vh;display:flex;flex-direction:column}
-    .header{background:#FFB800;padding:14px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-    .header h2{font-size:17px;font-weight:700;color:#1e1e1e;flex:1}
-    .header .order-id{font-size:11px;color:#5a3e00;font-family:monospace}
-    #map{height:300px;width:100%;flex-shrink:0;background:#e8e0d8}
-    .content{padding:14px 16px;flex:1;overflow-y:auto}
-    .card{background:#fff8e1;border:1px solid #FFB800;border-radius:12px;padding:12px 14px;margin-bottom:12px}
-    .card-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#c47f00;font-weight:700;margin-bottom:6px}
-    .card-value{font-size:14px;color:#1e1e1e;line-height:1.6}
-    .address-text{font-size:13px;color:#555;margin-top:4px;line-height:1.5}
-    audio{width:100%;border-radius:8px;margin-top:6px}
-    .landmark-img{width:100%;border-radius:8px;margin-top:6px;max-height:180px;object-fit:cover}
-    .btn-row{display:flex;flex-direction:column;gap:10px;padding:14px 16px 20px}
-    .btn{padding:15px;border:none;border-radius:40px;font-size:15px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
-    .btn:active{transform:scale(.97)}
-    .btn-nav  {background:#FFB800;color:#1e1e1e}
-    .btn-near {background:#0A2647;color:#fff}
-    .btn-wrong{background:#dc2626;color:#fff}
-    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:12px;color:#888;font-size:14px}
-    .spinner{width:36px;height:36px;border:3px solid #eee;border-top-color:#FFB800;border-radius:50%;animation:spin .8s linear infinite}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;min-height:100vh}
+
+    .container{
+      max-width:600px;margin:0 auto;background:#fff;
+      min-height:100vh;display:flex;flex-direction:column;
+      box-shadow:0 0 20px rgba(0,0,0,0.08);
+    }
+
+    /* Header */
+    .header{
+      background:#FFB800;padding:14px 18px;
+      display:flex;align-items:center;gap:12px;flex-shrink:0;
+      position:sticky;top:0;z-index:100;
+    }
+    .header h2{font-size:18px;font-weight:800;color:#1e1e1e;flex:1;letter-spacing:-0.3px}
+    .header .order-id{font-size:11px;color:#5a3e00;font-family:monospace;margin-top:2px}
+
+    /* Map */
+    #map{height:260px;width:100%;flex-shrink:0;background:#e8e0d8}
+
+    /* Content */
+    .content{padding:16px;flex:1;overflow-y:auto;background:#f8f8f8}
+
+    .card{
+      background:#fff;border:1px solid #f0f0f0;border-radius:14px;
+      padding:14px 16px;margin-bottom:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    }
+    .card-label{
+      font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+      color:#FFB800;font-weight:700;margin-bottom:8px;
+    }
+    .card-value{font-size:14px;color:#1e1e1e;line-height:1.65;font-weight:500}
+    .address-text{font-size:13px;color:#888;margin-top:6px;line-height:1.5}
+
+    audio{width:100%;border-radius:10px;margin-top:8px}
+    .landmark-img{width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover}
+
+    /* Action buttons */
+    .btn-row{
+      display:flex;flex-direction:column;gap:10px;
+      padding:16px;background:#fff;border-top:1px solid #f0f0f0;
+    }
+
+    .btn{
+      padding:16px;border:none;border-radius:14px;
+      font-size:15px;font-weight:700;cursor:pointer;width:100%;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      transition:all .15s;min-height:52px;
+    }
+    .btn:active{transform:scale(.97);opacity:.92}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+
+    .btn-nav  {background:#FFB800;color:#1e1e1e;box-shadow:0 4px 14px rgba(255,184,0,0.3)}
+    .btn-near {background:#1a1a2e;color:#fff;box-shadow:0 4px 14px rgba(26,26,46,0.2)}
+    .btn-wrong{background:#ef4444;color:#fff;box-shadow:0 4px 14px rgba(239,68,68,0.25)}
+
+    .loading{
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;height:200px;gap:12px;color:#aaa;font-size:14px;
+    }
+    .spinner{
+      width:32px;height:32px;border:3px solid #f0f0f0;
+      border-top-color:#FFB800;border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
     @keyframes spin{to{transform:rotate(360deg)}}
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(20,20,20,.9);color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;z-index:9999;white-space:nowrap;animation:fadeUp .2s ease}
-    @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-    .error-box{padding:30px 20px;text-align:center;color:#dc2626}
-    .error-box h3{margin-bottom:8px}
+
+    .toast{
+      position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+      background:rgba(20,20,20,.88);color:#fff;padding:11px 24px;
+      border-radius:50px;font-size:14px;font-weight:600;
+      z-index:9999;white-space:nowrap;animation:fadeUp .2s ease;
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateX(-50%) translateY(8px)}
+      to  {opacity:1;transform:translateX(-50%) translateY(0)}
+    }
+
+    .error-box{padding:30px 20px;text-align:center;color:#ef4444}
+    .error-box h3{margin-bottom:8px;font-size:18px}
+    .error-box p{font-size:14px;color:#888}
+
+    /* Responsive — bigger screens */
+    @media(min-width:600px){
+      #map{height:320px}
+      .btn{font-size:16px}
+    }
   </style>
 </head>
 <body>

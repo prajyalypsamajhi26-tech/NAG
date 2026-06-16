@@ -39,7 +39,15 @@ class DoorPilotApp {
     // Show landing page after animation
     setTimeout(() => {
       this.showPage('landing');
-      setTimeout(() => this.showPage('order'), 2500);
+      setTimeout(() => {
+        this.showPage('order');
+        // Reveal the header once we leave the intro screen
+        const header = document.getElementById('app-header');
+        if (header) {
+          header.style.visibility = 'visible';
+          header.style.opacity = '1';
+        }
+      }, 2500);
     }, 500);
   }
 
@@ -304,9 +312,9 @@ class DoorPilotApp {
   }
 
   setupCategoryFilter() {
-    document.querySelectorAll('.category-pill').forEach(btn => {
+    document.querySelectorAll('.zp-cat-tile, .category-pill').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.zp-cat-tile, .category-pill').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.selectedCategory = btn.dataset.category;
         this.renderCatalog();
@@ -334,7 +342,23 @@ class DoorPilotApp {
       const section = document.createElement('div');
       section.className = 'catalog-section';
 
-      section.innerHTML = `<h2 class="cat-title">${category}</h2>`;
+      // Map each category key to its SVG icon
+      const catIcons = {
+        'all': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+        '🥬 Groceries': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-4 0-8-5-7-10 1-4 5-6 8-5 3 1 5 5 3 9-1 3-3 6-4 6z"/><path d="M12 8c0-4 3-6 3-6"/><path d="M12 7c-2-4-5-5-5-5"/><path d="M13 9c3-3 6-3 6-3"/></svg>`,
+        '🍔 Food': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18M3 15h18"/><path d="M5 19h14a2 2 0 0 0 2-2v-1H3v1a2 2 0 0 0 2 2z"/><path d="M3 11a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6"/></svg>`,
+        '🍿 Snacks': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-2 12H8L6 8z"/><path d="M5 8c0-1.5 1.5-4 3-4s2 1.5 3 1.5S13 4 14 4s3 2.5 3 4"/><line x1="12" y1="8" x2="12" y2="20"/></svg>`,
+        '🍪 Cookies': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="8" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg>`,
+        '🥤 Beverages': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14l-2 16H7L5 3z"/><path d="M5 8h14"/></svg>`,
+        '💊 Medicines': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7.07-7.07l7 7a5 5 0 0 1-7.07 7.07z"/><line x1="7" y1="7" x2="17" y2="17"/></svg>`,
+        '📄 Documents': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`
+      };
+
+      const icon = catIcons[category] || catIcons['all'];
+      // Strip emoji prefix from display name (e.g. "🥬 Groceries" → "Groceries")
+      const displayName = category.replace(/^\p{Emoji}\s*/u, '');
+
+      section.innerHTML = `<h2 class="cat-title"><span class="cat-title-icon">${icon}</span>${displayName}</h2>`;
 
       const row = document.createElement('div');
       row.className = 'product-grid';
