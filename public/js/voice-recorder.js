@@ -5,69 +5,125 @@ class VoiceRecorder {
     this.audioChunks   = [];
     this.isRecording   = false;
     this.startTime     = null;
-    this._resolveStop  = null; // promise resolver for stopRecording()
+    this._stream       = null;
+    this._stopPromise  = null;
+    this._resolveStop  = null;
   }
 
-  // Pick the best supported mimeType for this browser
+  // Pick the best MIME type the browser supports
   _getBestMimeType() {
     const types = [
       'audio/webm;codecs=opus',
       'audio/webm',
       'audio/ogg;codecs=opus',
       'audio/mp4',
-      'audio/mpeg'
     ];
     for (const t of types) {
-      if (MediaRecorder.isTypeSupported(t)) return t;
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(t)) return t;
     }
-    return ''; // let browser decide
+    return '';
   }
 
   async startRecording() {
+    // Clean up any previous session first
+    this._cleanup();
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = this._getBestMimeType();
-
-      this.mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : {});
-      this.audioChunks   = [];
-      this.startTime     = Date.now();
-      this.isRecording   = true;
-
-      this.mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) this.audioChunks.push(e.data);
-      };
-
-      // onstop fires after all data is available — safe to build blob here
-      this.mediaRecorder.onstop = () => {
-        this.isRecording = false;
-        if (this._resolveStop) {
-          const blob = new Blob(this.audioChunks, {
-            type: this.mediaRecorder.mimeType || 'audio/webm'
-          });
-          this._resolveStop(blob);
-          this._resolveStop = null;
+      this._stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
         }
-        // Stop all mic tracks
-        stream.getTracks().forEach(t => t.stop());
-      };
-
-      this.mediaRecorder.start(100); // collect data every 100ms
-      return true;
+      });
     } catch (err) {
-      console.error('Microphone access denied:', err);
-      alert('Microphone access is required to record voice notes.\nPlease allow microphone in your browser settings.');
+      console.error('Mic access error:', err);
+      if (err.name === 'NotAllowedError') {
+        alert('Microphone permission denied.\nClick the lock icon in the address bar → Allow microphone.');
+      } else {
+        alert('Could not access microphone: ' + err.message);
+      }
       return false;
+    }
+
+    const mimeType = this._getBestMimeType();
+    try {
+      this.mediaRecorder = new MediaRecorder(
+        this._stream,
+        mimeType ? { mimeType } : {}
+      );
+    } catch (e) {
+      // Fallback — let browser pick
+      this.mediaRecorder = new MediaRecorder(this._stream);
+    }
+
+    this.audioChunks = [];
+    this.startTime   = Date.now();
+    this.isRecording = true;
+
+    this.mediaRecorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        this.audioChunks.push(e.data);
+      }
+    };
+
+    // Resolve the stop promise once all data is collected
+    this.mediaRecorder.onstop = () => {
+      this.isRecording = false;
+      this._stopStream();
+
+      const usedType = this.mediaRecorder.mimeType || mimeType || 'audio/webm';
+      const blob = new Blob(this.audioChunks, { type: usedType });
+
+      console.log(`Recording stopped. Blob size: ${blob.size} bytes, type: ${blob.type}`);
+
+      if (this._resolveStop) {
+        this._resolveStop(blob);
+        this._resolveStop = null;
+      }
+    };
+
+    // Collect data every 250ms for reliable chunks
+    this.mediaRecorder.start(250);
+    console.log('Recording started, mimeType:', this.mediaRecorder.mimeType);
+    return true;
+  }
+
+  // Returns Promise<Blob> — safe to await
+  stopRecording() {
+    if (!this.mediaRecorder || !this.isRecording) {
+      return Promise.resolve(null);
+    }
+
+    this._stopPromise = new Promise((resolve) => {
+      this._resolveStop = resolve;
+    });
+
+    try {
+      this.mediaRecorder.stop(); // triggers onstop after flush
+    } catch (e) {
+      console.error('Error stopping recorder:', e);
+      this._resolveStop && this._resolveStop(null);
+    }
+
+    return this._stopPromise;
+  }
+
+  _stopStream() {
+    if (this._stream) {
+      this._stream.getTracks().forEach(t => t.stop());
+      this._stream = null;
     }
   }
 
-  // Returns a Promise<Blob> — resolves when recording is fully stopped
-  stopRecording() {
-    if (!this.mediaRecorder || !this.isRecording) return Promise.resolve(null);
-
-    return new Promise((resolve) => {
-      this._resolveStop = resolve;
-      this.mediaRecorder.stop(); // triggers onstop → resolves promise
-    });
+  _cleanup() {
+    this._stopStream();
+    this.audioChunks  = [];
+    this.startTime    = null;
+    this._resolveStop = null;
+    this._stopPromise = null;
+    this.isRecording  = false;
+    this.mediaRecorder = null;
   }
 
   getRecordingDuration() {
@@ -75,19 +131,9 @@ class VoiceRecorder {
     return Math.floor((Date.now() - this.startTime) / 1000);
   }
 
-  createAudioElement(blob) {
-    if (!blob) return null;
-    const audio = document.createElement('audio');
-    audio.controls = true;
-    audio.src = URL.createObjectURL(blob);
-    audio.style.width = '100%';
-    return audio;
-  }
-
-  clearRecording() {
-    this.audioChunks  = [];
-    this.startTime    = null;
-    this._resolveStop = null;
+  // Call this only AFTER stopRecording() has resolved
+  reset() {
+    this.audioChunks = [];
   }
 }
 

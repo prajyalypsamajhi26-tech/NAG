@@ -47,6 +47,8 @@ class DoorPilotApp {
           header.style.visibility = 'visible';
           header.style.opacity = '1';
         }
+        // Init cart dropdown
+        this.initCartDropdown();
       }, 2500);
     }, 500);
   }
@@ -479,8 +481,8 @@ class DoorPilotApp {
   }
 
   updateCartUI() {
-    const countEl = document.getElementById('cart-count');
-    const totalEl = document.getElementById('cart-total');
+    const countEl   = document.getElementById('cart-count');
+    const totalEl   = document.getElementById('cart-total');
     const proceedBtn = document.getElementById('proceed-btn');
 
     let count = 0;
@@ -489,37 +491,93 @@ class DoorPilotApp {
     this.cart.forEach(item => {
       count += item.quantity;
       total += item.price * item.quantity;
-
-      const qtyEl = document.getElementById(`qty-${item.id}`);
-      if (qtyEl) qtyEl.textContent = item.quantity;
     });
 
-    countEl.textContent = count;
-    totalEl.textContent = `₹${total}`;
-    proceedBtn.disabled = count === 0;
+    if (countEl) countEl.textContent = count;
+    if (totalEl) totalEl.textContent = `₹${total}`;
+    if (proceedBtn) proceedBtn.disabled = count === 0;
 
-    // Update header cart count if present
+    // Header cart count badge
     const headerCount = document.getElementById('header-cart-count');
     if (headerCount) {
       const prev = parseInt(headerCount.textContent) || 0;
       headerCount.textContent = count;
-      // Pop animation when count increases
       if (count > prev) {
         headerCount.classList.remove('popping');
-        void headerCount.offsetWidth; // reflow
+        void headerCount.offsetWidth;
         headerCount.classList.add('popping');
         setTimeout(() => headerCount.classList.remove('popping'), 350);
       }
     }
 
-    // Glow cart bar when items present
-    const cartBar = document.getElementById('cart-summary-bar');
-    if (cartBar) {
-      cartBar.classList.toggle('has-items', count > 0);
-    }
+    // Dropdown total
+    const ddTotal = document.getElementById('cart-total-dropdown');
+    if (ddTotal) ddTotal.textContent = `₹${total}`;
+
+    // Refresh dropdown body if open
+    this.renderCartDropdown();
 
     // Store cart items in order data
     this.orderData.items = this.cart;
+  }
+
+  renderCartDropdown() {
+    const body      = document.getElementById('cart-dropdown-body');
+    const ddTotal   = document.getElementById('cart-total-dropdown');
+    const proceedBtn = document.getElementById('proceed-btn');
+
+    if (!body) return;
+
+    let total = 0;
+    this.cart.forEach(i => total += i.price * i.quantity);
+    if (ddTotal) ddTotal.textContent = `₹${total}`;
+    if (proceedBtn) proceedBtn.disabled = this.cart.length === 0;
+
+    if (this.cart.length === 0) {
+      body.innerHTML = '<p class="cart-empty-msg">Your cart is empty</p>';
+      return;
+    }
+
+    body.innerHTML = this.cart.map(item => `
+      <div class="cart-dd-item">
+        <img class="cart-dd-img" src="${item.img}" alt="${item.name}"
+             onerror="this.src='https://placehold.co/44x44/f5f5f5/FFB800?text=?'">
+        <div class="cart-dd-info">
+          <div class="cart-dd-name">${item.name}</div>
+          <div class="cart-dd-qty-price">${item.quantity} × ₹${item.price}</div>
+        </div>
+        <span class="cart-dd-price">₹${item.price * item.quantity}</span>
+      </div>
+    `).join('');
+  }
+
+  initCartDropdown() {
+    const cartBtn = document.getElementById('cart-btn');
+    const dropdown = document.getElementById('cart-dropdown');
+    const closeBtn = document.getElementById('cart-dropdown-close');
+
+    if (!cartBtn || !dropdown) return;
+
+    cartBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.contains('open');
+      dropdown.classList.toggle('open', !isOpen);
+      if (!isOpen) this.renderCartDropdown();
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.remove('open');
+      });
+    }
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && e.target !== cartBtn) {
+        dropdown.classList.remove('open');
+      }
+    });
   }
 
   async saveCart() {
@@ -701,35 +759,60 @@ class DoorPilotApp {
     }, 100);
   }
 
-  stopVoiceRecording() {
+  async stopVoiceRecording() {
     clearInterval(this.recordingInterval);
 
-    this.voiceBlob = voiceRecorder.stopRecording();
-    voiceRecorder.clearRecording();
+    // Wait for all audio data to be collected before building blob
+    const blob = await voiceRecorder.stopRecording();
+    voiceRecorder.reset(); // safe to reset chunks now, blob is already built
 
     document.getElementById('start-recording').classList.remove('hidden');
     document.getElementById('stop-recording').classList.add('hidden');
     document.getElementById('recording-time').classList.add('hidden');
 
-    // Show playback
-    const audio = voiceRecorder.createAudioElement(this.voiceBlob);
+    if (!blob || blob.size === 0) {
+      alert('Recording was empty — please try again and speak into the mic.');
+      return;
+    }
+
+    this.voiceBlob = blob;
+
+    // Build object URL and inject a real <audio> element
+    const audioUrl = URL.createObjectURL(blob);
     const playback = document.getElementById('voice-playback');
+
+    // Create audio element programmatically so blob URL is set before it tries to load
+    const audioEl = document.createElement('audio');
+    audioEl.controls  = true;
+    audioEl.preload   = 'auto';
+    audioEl.style.cssText = 'width:100%;border-radius:10px;margin-bottom:10px;display:block;';
+    audioEl.src = audioUrl;
+
+    const reRecordBtn = document.createElement('button');
+    reRecordBtn.id        = 're-record-btn';
+    reRecordBtn.className = 'btn btn-secondary';
+    reRecordBtn.textContent = 'Re-record';
+    reRecordBtn.setAttribute('aria-label', 'Re-record voice');
+    reRecordBtn.addEventListener('click', () => this.resetVoiceRecording());
+
     playback.innerHTML = '';
-    playback.appendChild(audio);
-    playback.innerHTML += '<button id="re-record-btn" class="btn btn-secondary">Re-record</button>';
+    playback.appendChild(audioEl);
+    playback.appendChild(reRecordBtn);
     playback.classList.remove('hidden');
 
-    // Re-attach event listener
-    document.getElementById('re-record-btn').addEventListener('click', () => {
-      this.resetVoiceRecording();
-    });
+    // Give the browser a tick then try auto-loading
+    setTimeout(() => audioEl.load(), 50);
   }
 
   resetVoiceRecording() {
     this.voiceBlob = null;
+    voiceRecorder._cleanup();
     document.getElementById('voice-playback').classList.add('hidden');
+    document.getElementById('voice-playback').innerHTML = '';
     document.getElementById('start-recording').classList.remove('hidden');
-    document.getElementById('start-recording').click();
+    document.getElementById('stop-recording').classList.add('hidden');
+    document.getElementById('recording-time').classList.add('hidden');
+    document.getElementById('timer').textContent = '0:00';
   }
 
   // ==================== REVIEW & CONFIRM ====================
