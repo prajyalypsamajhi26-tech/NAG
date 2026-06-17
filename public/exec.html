@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>DoorPilot — Delivery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Inter',Arial,sans-serif;background:#f0f0f0;overflow:hidden}
+
+    /* ── screens ── */
+    .screen{display:none;height:100vh;flex-direction:column}
+    .screen.active{display:flex}
+
+    /* ── OTP ── */
+    #otp-screen{background:#1a1a2e;align-items:center;justify-content:center;padding:32px 24px;gap:0}
+    .otp-brand{font-family:'Fredoka One',cursive;font-size:44px;font-weight:400;color:#FFB800;margin-bottom:32px}
+    .otp-title{font-size:28px;font-weight:900;color:#fff;margin-bottom:8px;text-align:center}
+    .otp-sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:36px;text-align:center}
+    .otp-row{display:flex;gap:12px;margin-bottom:28px}
+    .otp-box{width:64px;height:76px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);
+      border-radius:14px;color:#fff;font-size:34px;font-weight:900;text-align:center;
+      outline:none;caret-color:#FFB800;transition:border-color .15s}
+    .otp-box:focus{border-color:#FFB800;background:rgba(255,184,0,.12)}
+    .otp-verify-btn{width:100%;max-width:280px;padding:17px;background:#FFB800;color:#1a1a2e;
+      border:none;border-radius:50px;font-size:17px;font-weight:900;cursor:pointer}
+    .otp-err{color:#ef4444;font-size:14px;font-weight:700;margin-top:14px;min-height:20px}
+
+    /* ── NAV SCREEN ── */
+    #nav-screen{background:#fff}
+
+    /* exec header bar */
+    .exec-header{
+      background:#FFB800;padding:14px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-shrink:0;z-index:10;
+    }
+    .exec-brand{font-family:'Fredoka One',cursive;font-size:26px;color:#1a1a2e}
+    .step-badge{
+      background:#1a1a2e;color:#FFB800;
+      font-size:12px;font-weight:700;
+      padding:5px 14px;border-radius:50px;
+      letter-spacing:.3px;
+    }
+
+    /* map wrap — 45vh */
+    .map-wrap{position:relative;flex-shrink:0;height:45vh}
+    #exec-map{width:100%;height:100%;z-index:1;background:#e8e8e8}
+
+    /* voice sticky — bottom of map */
+    .voice-sticky{
+      position:absolute;bottom:0;left:0;right:0;
+      background:rgba(26,26,46,.92);
+      padding:10px 16px;display:flex;align-items:center;gap:12px;
+      z-index:500;backdrop-filter:blur(8px);
+    }
+    .voice-label{flex:1;font-size:13px;font-weight:700;color:rgba(255,255,255,.8)}
+    .voice-play{width:40px;height:40px;border-radius:50%;background:#FFB800;border:none;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .voice-play svg{width:18px;height:18px;fill:#1a1a2e}
+
+    /* bottom panel */
+    .bottom-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+    /* step card */
+    .step-card{flex:1;padding:14px 16px 8px;overflow-y:auto}
+    .step-header{margin-bottom:10px}
+    .step-num{font-size:11px;font-weight:700;color:#FFB800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+    .step-name{font-size:22px;font-weight:900;color:#1a1a2e;letter-spacing:-.3px;line-height:1.15}
+    .step-instr{font-size:14px;line-height:1.65;color:#333;background:#fffbee;
+      border-left:4px solid #FFB800;border-radius:0 10px 10px 0;
+      padding:11px 14px;margin-bottom:10px}
+    .step-photo{width:100%;border-radius:12px;max-height:140px;object-fit:cover;margin-bottom:6px}
+
+    /* progress dots */
+    .dots{display:flex;justify-content:center;gap:6px;padding:6px 0}
+    .dot{width:7px;height:7px;border-radius:50%;background:#ddd;transition:all .2s}
+    .dot.on{background:#FFB800;transform:scale(1.4)}
+    .dot.done{background:#22c55e}
+
+    /* prev/next */
+    .nav-row{display:flex;gap:10px;padding:8px 14px}
+    .nav-btn{flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:800;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+      transition:all .15s;border:none}
+    .nav-prev{background:#f0f0f0;color:#555}
+    .nav-prev:disabled{opacity:.35;cursor:not-allowed}
+    .nav-next{background:#1a1a2e;color:#FFB800;box-shadow:0 4px 14px rgba(26,26,46,.25)}
+    .nav-next:hover{background:#2d2d4a}
+
+    /* action buttons */
+    .act-row{display:flex;gap:8px;padding:0 14px 14px}
+    .act{flex:1;padding:14px 6px;border:none;border-radius:12px;
+      font-size:12px;font-weight:900;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+      transition:all .15s;min-height:60px}
+    .act:active{transform:scale(.96)}
+    .act svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+    .act-near{background:#FFB800;color:#1a1a2e}
+    .act-done{background:#1a1a2e;color:#FFB800}
+    .act-wrong{background:#ef4444;color:#fff}
+
+    /* arrived */
+    #arrived-screen{background:#FFB800;align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+    .arr-ring{width:100px;height:100px;border-radius:50%;background:#1a1a2e;
+      display:flex;align-items:center;justify-content:center;margin-bottom:24px;
+      box-shadow:0 8px 32px rgba(26,26,46,.35);
+      animation:pop .6s cubic-bezier(.34,1.4,.64,1) both}
+    @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .arr-ring svg{width:48px;height:48px;stroke:#FFB800;fill:none;stroke-width:2.5}
+    .arr-title{font-size:30px;font-weight:900;color:#1a1a2e;margin-bottom:8px}
+    .arr-flat{font-family:'Fredoka One',cursive;font-size:54px;font-weight:400;color:#1a1a2e;line-height:1;margin:12px 0}
+    .arr-sub{font-size:14px;color:rgba(26,26,46,.6);margin-bottom:32px}
+    .bell-btn{padding:16px 44px;background:#1a1a2e;color:#FFB800;
+      border:none;border-radius:50px;font-size:17px;font-weight:900;
+      cursor:pointer;display:flex;align-items:center;gap:12px}
+
+    /* expired */
+    #expired-screen{background:#fff;align-items:center;justify-content:center;text-align:center;padding:40px}
+    .exp-icon{font-size:52px;margin-bottom:16px}
+    .exp-title{font-size:22px;font-weight:900;color:#ef4444;margin-bottom:8px}
+    .exp-sub{font-size:14px;color:#888}
+
+    /* toast */
+    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
+      background:rgba(20,20,20,.9);color:#fff;padding:11px 22px;
+      border-radius:50px;font-size:14px;font-weight:700;z-index:9999;
+      white-space:nowrap;animation:tUp .2s ease}
+    @keyframes tUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  </style>
+</head>
+<body>
+
+<!-- OTP Screen -->
+<div id="otp-screen" class="screen">
+  <div class="otp-brand">DoorPilot</div>
+  <div class="otp-title">Enter OTP</div>
+  <div class="otp-sub">Customer shared a 4-digit code with you</div>
+  <div class="otp-row">
+    <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+    <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+    <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+    <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+  </div>
+  <button class="otp-verify-btn" id="otp-verify-btn">Verify &rarr;</button>
+  <div class="otp-err" id="otp-err"></div>
+</div>
+
+<!-- Nav Screen -->
+<div id="nav-screen" class="screen">
+
+  <!-- Yellow header bar -->
+  <div class="exec-header">
+    <span class="exec-brand">DoorPilot</span>
+    <span class="step-badge" id="step-badge">Step 1 of 4</span>
+  </div>
+
+  <!-- Map with voice bar overlaid at bottom -->
+  <div class="map-wrap">
+    <div id="exec-map"></div>
+    <div class="voice-sticky" id="voice-bar" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      <span class="voice-label">Voice note from customer</span>
+      <button class="voice-play" id="voice-play-btn">
+        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <audio id="voice-audio" style="display:none"></audio>
+    </div>
+  </div>
+
+  <!-- Bottom panel -->
+  <div class="bottom-panel">
+    <div class="dots" id="dots"></div>
+    <div class="step-card" id="step-card"></div>
+
+    <!-- Prev / Next -->
+    <div class="nav-row">
+      <button class="nav-btn nav-prev" id="prev-btn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Prev
+      </button>
+      <button class="nav-btn nav-next" id="next-btn">
+        Next
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="act-row">
+      <button class="act act-near" id="near-btn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        I'm Near
+      </button>
+      <button class="act act-done" id="done-btn">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke-linejoin="round"/></svg>
+        Done, Next
+      </button>
+      <button class="act act-wrong" id="wrong-btn">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Wrong Gate
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Arrived Screen -->
+<div id="arrived-screen" class="screen">
+  <div class="arr-ring">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <div class="arr-title">You've Arrived!</div>
+  <div class="arr-flat" id="arr-flat">—</div>
+  <div class="arr-sub">Ring the bell and hand over the order</div>
+  <button class="bell-btn" id="bell-btn">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Ring the Bell 🔔
+  </button>
+</div>
+
+<!-- Expired Screen -->
+<div id="expired-screen" class="screen">
+  <div class="exp-icon">⏱️</div>
+  <div class="exp-title">Link Expired</div>
+  <div class="exp-sub">Ask the customer to generate a new link.</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ── Utilities ─────────────────────────────────────────────────────────────
+let DATA = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function toast(msg, ms=3000) {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), ms);
+}
+
+// ── Load data from server using short ID in URL path ─────────────────────
+// URL is /exec/ABCD1234 — extract the ID from pathname
+async function loadData() {
+  const parts = location.pathname.split('/').filter(Boolean);
+  const shortId = parts[parts.length - 1]; // last segment
+
+  // Fallback: also support old hash-based links
+  if (!shortId || shortId === 'exec.html') {
+    try {
+      const h = location.hash.slice(1);
+      if (!h) throw new Error('no id');
+      DATA = JSON.parse(decodeURIComponent(escape(atob(h))));
+      startApp();
+    } catch(e) {
+      showExpired('Invalid Link', 'No delivery data found in this link.');
+    }
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/exec-links/${shortId}`);
+    if (res.status === 404) { showExpired('Link Not Found', 'This delivery link is invalid.'); return; }
+    if (res.status === 410) { showExpired('Link Expired', 'Ask the customer to generate a new one.'); return; }
+    const json = await res.json();
+    if (!json.success) { showExpired('Error', json.error); return; }
+    DATA = json.payload;
+    startApp();
+  } catch(e) {
+    showExpired('Connection Error', 'Could not load delivery data. Check your connection.');
+  }
+}
+
+function showExpired(title, sub) {
+  show('expired-screen');
+  document.querySelector('.exp-title').textContent = title;
+  document.querySelector('.exp-sub').textContent = sub;
+}
+
+function startApp() {
+  if (DATA.exp && Date.now() > DATA.exp) {
+    showExpired('Link Expired', 'Ask the customer to generate a new one.');
+  } else if (DATA.otp) {
+    show('otp-screen');
+    initOTP();
+  } else {
+    show('nav-screen');
+    initNav();
+  }
+}
+
+loadData();
+
+// ── OTP ────────────────────────────────────────────────────────────────────
+function initOTP() {
+  const boxes = document.querySelectorAll('.otp-box');
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/\D/g,'').slice(-1);
+      if (b.value && i < boxes.length-1) boxes[i+1].focus();
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key==='Backspace' && !b.value && i>0) boxes[i-1].focus();
+    });
+  });
+  document.getElementById('otp-verify-btn').addEventListener('click', () => {
+    const entered = [...boxes].map(b=>b.value).join('');
+    if (entered.length < 4) { document.getElementById('otp-err').textContent='Enter all 4 digits'; return; }
+    if (entered === String(DATA.otp)) { show('nav-screen'); initNav(); }
+    else {
+      document.getElementById('otp-err').textContent='Wrong OTP — try again';
+      boxes.forEach(b=>b.value=''); boxes[0].focus();
+    }
+  });
+  boxes[0].focus();
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+let steps=[], cur=0, map=null, custMarker=null, myMarker=null, myLine=null;
+
+function buildSteps(d) {
+  const s = [];
+  if (d.colony||d.landmarks)
+    s.push({ name: d.colony||'Find the Area', instr: d.landmarks||`Head to ${d.colony||'the colony'}`, img:null });
+  if (d.gate)
+    s.push({ name:`Gate ${d.gate}`, instr:`Enter through Gate ${d.gate}`, img:null });
+  s.push({ name: d.apt||'Enter Building', instr: d.instr||'Proceed to the building entrance', img: d.img||null });
+  if (d.floor)
+    s.push({ name:`${d.lift?'Lift to':'Climb to'} Floor ${d.floor}`, instr: d.lift?`Take the lift to floor ${d.floor}`:`Use stairs to floor ${d.floor}`, img:null });
+  s.push({
+    name: d.flat?`Flat ${d.flat}`:'Your Destination',
+    instr: [d.color&&`Door: ${d.color}`, d.intercom&&`Intercom: ${d.intercom}`, !d.ghost&&d.name&&`Customer: ${d.name}`].filter(Boolean).join(' • ')||'You are at the destination',
+    img: null, final: true
+  });
+  return s;
+}
+
+function initNav() {
+  steps = buildSteps(DATA);
+
+  // ── Map init ──────────────────────────────────────────────────────────
+  const lat = parseFloat(DATA.lat), lng = parseFloat(DATA.lng);
+
+  map = L.map('exec-map', { zoomControl:true, maxZoom:20 }).setView([lat, lng], 17);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    maxZoom:20, maxNativeZoom:19
+  }).addTo(map);
+
+  // Customer pin — cute yellow house pin
+  const custIcon = L.divIcon({
+    className:'',
+    html:`<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.25))">
+  <div style="width:48px;height:48px;background:linear-gradient(145deg,#FFD440,#FFB800);border:3px solid #1a1a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(255,184,0,0.2)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  </div>
+  <div style="width:3px;height:12px;background:#1a1a2e;margin-top:-1px"></div>
+  <div style="width:12px;height:5px;background:rgba(0,0,0,0.15);border-radius:50%"></div>
+</div>`,
+    iconSize:[48,67], iconAnchor:[24,67], popupAnchor:[0,-70]
+  });
+
+  custMarker = L.marker([lat, lng], { icon: custIcon })
+    .addTo(map)
+    .bindPopup(`<b>📍 ${!DATA.ghost && DATA.name ? DATA.name : 'Delivery Destination'}</b><br>Flat ${DATA.flat||'—'}`)
+    .openPopup();
+
+  // My live location
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(pos => {
+      const { latitude:my, longitude:mx } = pos.coords;
+      const myIcon = L.divIcon({
+        className:'',
+        html:`<div style="width:18px;height:18px;background:#4285F4;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 5px rgba(66,133,244,.25)"></div>`,
+        iconSize:[18,18], iconAnchor:[9,9]
+      });
+      if (!myMarker) {
+        myMarker = L.marker([my,mx],{icon:myIcon}).addTo(map).bindPopup('You');
+        myLine = L.polyline([[my,mx],[lat,lng]],{color:'#FFB800',weight:3,dashArray:'8 5',opacity:.8}).addTo(map);
+        map.fitBounds([[lat,lng],[my,mx]],{padding:[40,40]});
+      } else {
+        myMarker.setLatLng([my,mx]);
+        myLine.setLatLngs([[my,mx],[lat,lng]]);
+      }
+    }, null, { enableHighAccuracy:true });
+  }
+
+  // Voice
+  if (DATA.voice) {
+    const vbar = document.getElementById('voice-bar');
+    vbar.style.display = 'flex';
+    const audio = document.getElementById('voice-audio');
+    audio.src = DATA.voice;
+    let playing = false;
+    document.getElementById('voice-play-btn').addEventListener('click', () => {
+      if (playing) { audio.pause(); playing=false; }
+      else { audio.play(); playing=true; audio.onended=()=>{playing=false}; }
+    });
+  }
+
+  // Dots
+  const dotsEl = document.getElementById('dots');
+  dotsEl.innerHTML = steps.map((_,i)=>`<div class="dot" id="d${i}"></div>`).join('');
+
+  // Buttons
+  document.getElementById('prev-btn').addEventListener('click', ()=>{ if(cur>0){cur--;render();} });
+  document.getElementById('next-btn').addEventListener('click', advance);
+  document.getElementById('done-btn').addEventListener('click', advance);
+
+  document.getElementById('near-btn').addEventListener('click', ()=>{
+    const phone = DATA.phone||'';
+    const body = encodeURIComponent("Hi! I'm your DoorPilot delivery executive — I'm almost at your door!");
+    window.open(`sms:${phone}?body=${body}`);
+    toast('📍 SMS ready — tap Send to notify customer');
+  });
+
+  document.getElementById('wrong-btn').addEventListener('click', ()=>{
+    const phone = DATA.phone||'';
+    const body = encodeURIComponent("Hi! I'm your DoorPilot delivery executive — I'm at the wrong location. Can you help me find the right one?");
+    window.open(`sms:${phone}?body=${body}`);
+    toast('❌ SMS ready — tap Send');
+  });
+
+  document.getElementById('bell-btn').addEventListener('click', ()=>{
+    toast('🔔 Almost done!',2000);
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  });
+
+  render();
+  setTimeout(()=>map.invalidateSize(),300);
+}
+
+function advance() {
+  if (cur < steps.length-1) { cur++; render(); }
+  else { showArrived(); }
+}
+
+function render() {
+  const s = steps[cur], total = steps.length;
+  // Dots
+  for(let i=0;i<total;i++){
+    const d=document.getElementById(`d${i}`);
+    if(d) d.className='dot'+(i<cur?' done':i===cur?' on':'');
+  }
+  // Prev/Next
+  document.getElementById('prev-btn').disabled = cur===0;
+  const nb = document.getElementById('next-btn');
+  nb.innerHTML = cur===total-1
+    ? 'Arrived ✓'
+    : `Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
+
+  // Card
+  document.getElementById('step-card').innerHTML = `
+    <div class="step-header">
+      <div class="step-num">Step ${cur+1} of ${total}</div>
+      <div class="step-name">${s.name}</div>
+    </div>
+    <div class="step-instr">${s.instr}</div>
+    ${s.img?`<img class="step-photo" src="${s.img}" alt="Landmark">`:''}
+  `;
+
+  // Step badge in header
+  const badge = document.getElementById('step-badge');
+  if(badge) badge.textContent = `Step ${cur+1} of ${total}`;
+
+  // Pan map gently
+  if (map) {
+    const lat=parseFloat(DATA.lat), lng=parseFloat(DATA.lng);
+    map.panTo([lat,lng],{animate:true,duration:.5});
+  }
+}
+
+function showArrived() {
+  show('arrived-screen');
+  document.getElementById('arr-flat').textContent = DATA.flat?`Flat ${DATA.flat}`:'Arrived';
+}
+</script>
+</body>
+</html>

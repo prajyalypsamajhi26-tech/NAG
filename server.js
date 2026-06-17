@@ -50,10 +50,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, _res, next) => { req.io = io; next(); });
 
 // ── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/orders',   require('./src/routes/orders'));
-app.use('/api/delivery', require('./src/routes/delivery'));
-app.use('/api/upload',   require('./src/routes/uploads'));
-app.use('/api/sms',      require('./src/routes/sms'));
+app.use('/api/orders',      require('./src/routes/orders'));
+app.use('/api/delivery',    require('./src/routes/delivery'));
+app.use('/api/upload',      require('./src/routes/uploads'));
+app.use('/api/sms',         require('./src/routes/sms'));
+app.use('/api/exec-links',  require('./src/routes/execLinks'));
 
 // ── Geocoding (Nominatim — free, no key needed) ──────────────────────────────
 app.get('/api/geocode', async (req, res) => {
@@ -105,6 +106,11 @@ app.get('/api/reverse-geocode', async (req, res) => {
 });
 
 // ── Delivery page routes ─────────────────────────────────────────────────────
+// /exec/:id — serves exec.html for the delivery executive (short link)
+app.get('/exec/:id', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'exec.html'));
+});
+
 // /delivery/:orderId  — serves delivery.html for the delivery executive
 // Supports both:
 //   /delivery/<orderId>?token=<findMeToken>   (from SMS link)

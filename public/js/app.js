@@ -851,6 +851,223 @@ class DoorPilotApp {
     `;
   }
 
+  // ==================== LINK GENERATION ====================
+
+  initLinkGen() {
+    this._lgOtp = null;
+    this._lgExpiry = 2;
+    this._lgGhost = false;
+
+    // OTP toggle
+    const otpToggle = document.getElementById('otp-toggle');
+    const otpDisplay = document.getElementById('otp-display');
+    otpToggle.checked = false;
+    otpDisplay.classList.add('hidden');
+
+    otpToggle.addEventListener('change', () => {
+      if (otpToggle.checked) {
+        this._lgOtp = this._genOtp();
+        document.getElementById('otp-code').textContent = this._lgOtp;
+        otpDisplay.classList.remove('hidden');
+      } else {
+        this._lgOtp = null;
+        otpDisplay.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('otp-refresh').addEventListener('click', () => {
+      this._lgOtp = this._genOtp();
+      document.getElementById('otp-code').textContent = this._lgOtp;
+    });
+
+    // Expiry pills
+    document.querySelectorAll('.lg-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lg-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this._lgExpiry = parseInt(btn.dataset.hours);
+      });
+    });
+
+    // Ghost mode
+    document.getElementById('ghost-toggle').addEventListener('change', (e) => {
+      this._lgGhost = e.target.checked;
+    });
+
+    // Generate button — upload files first, then build link
+    document.getElementById('generate-link-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('generate-link-btn');
+      btn.disabled = true;
+      btn.textContent = 'Uploading...';
+      try {
+        // Upload voice blob if not already uploaded
+        if (this.voiceBlob && !this.orderData.voiceNoteUrl) {
+          const r = await api.uploadVoice(this.voiceBlob);
+          this.orderData.voiceNoteUrl = r.url;
+        }
+        // Upload landmark blob if not already uploaded
+        if (this.landmarkBlob && !this.orderData.landmarkImageUrl) {
+          const r = await api.uploadLandmark(this.landmarkBlob);
+          this.orderData.landmarkImageUrl = r.url;
+        }
+      } catch(e) {
+        console.warn('Upload failed, continuing without media:', e);
+      }
+      btn.disabled = false;
+      btn.textContent = 'Generate Link';
+      await this.generateExecLink();
+    });
+
+    // Copy button
+    document.getElementById('copy-link-btn').addEventListener('click', () => {
+      const link = document.getElementById('generated-link').value;
+      navigator.clipboard.writeText(link).then(() => {
+        document.getElementById('copy-link-btn').textContent = 'Copied!';
+        setTimeout(() => {
+          document.getElementById('copy-link-btn').innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+        }, 2000);
+      });
+    });
+
+    // SMS share
+    document.getElementById('sms-share-btn').addEventListener('click', () => {
+      const link = document.getElementById('generated-link').value;
+      const execPhone = document.getElementById('exec-phone')?.value || '';
+      const customerPhone = this.orderData.customerPhone || '';
+      const phone = execPhone || customerPhone;
+      const msg = `DoorPilot Delivery Guide: ${link}${this._lgOtp ? ` | OTP: ${this._lgOtp}` : ''}`;
+      if (navigator.share) {
+        navigator.share({ title: 'DoorPilot Delivery', text: msg, url: link });
+      } else {
+        window.open(`sms:${phone}?body=${encodeURIComponent(msg)}`);
+      }
+    });
+
+    // WhatsApp share
+    document.getElementById('whatsapp-share-btn').addEventListener('click', () => {
+      const link = document.getElementById('generated-link').value;
+      const execPhone = document.getElementById('exec-phone')?.value?.replace(/\D/g,'') || '';
+      const msg = `🚚 *DoorPilot Delivery Guide*\nOpen this link for step-by-step navigation:\n${link}${this._lgOtp ? `\n\n🔑 OTP: *${this._lgOtp}*` : ''}`;
+      const encoded = encodeURIComponent(msg);
+      if (execPhone) {
+        // Direct chat to specific number (works on mobile)
+        window.open(`https://wa.me/91${execPhone}?text=${encoded}`);
+      } else {
+        // Share dialog — user picks contact
+        window.open(`https://wa.me/?text=${encoded}`);
+      }
+    });
+
+    // Done — place order
+    document.getElementById('done-share-btn').addEventListener('click', () => {
+      this.confirmAndPlaceOrder();
+    });
+
+    // Hide output initially
+    document.getElementById('link-output').classList.add('hidden');
+  }
+
+  _genOtp() {
+    return String(Math.floor(1000 + Math.random() * 9000));
+  }
+
+  async generateExecLink() {
+    const payload = {
+      v: 1,
+      otp:       this._lgOtp || null,
+      exp:       Date.now() + this._lgExpiry * 3600 * 1000,
+      ghost:     this._lgGhost,
+      name:      this._lgGhost ? null : this.orderData.customerName,
+      phone:     this.orderData.customerPhone,
+      flat:      this.orderData.deliveryDetails.flatNumber,
+      apt:       this.orderData.deliveryDetails.apartmentName,
+      colony:    this.orderData.deliveryDetails.colonyName,
+      color:     this.orderData.deliveryDetails.flatColor,
+      floor:     this.orderData.deliveryDetails.floorNumber,
+      lift:      this.orderData.deliveryDetails.hasLift,
+      gate:      this.orderData.deliveryDetails.gateNumber,
+      intercom:  this.orderData.deliveryDetails.intercomCode,
+      landmarks: this.orderData.deliveryDetails.specialIdentifiers,
+      lat:       this.orderData.mapPin.latitude,
+      lng:       this.orderData.mapPin.longitude,
+      instr:     this.orderData.textInstruction,
+      voice:     this.orderData.voiceNoteUrl  || null,
+      img:       this.orderData.landmarkImageUrl || null,
+    };
+
+    const execPhone   = document.getElementById('exec-phone')?.value?.trim() || '';
+    const smsStatusEl = document.getElementById('sms-status');
+    if (smsStatusEl) { smsStatusEl.textContent = '🔗 Creating link…'; smsStatusEl.style.color = '#888'; }
+
+    try {
+      const res  = await fetch('/api/exec-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload,
+          execPhone:    execPhone || null,
+          customerName: this._lgGhost ? null : this.orderData.customerName
+        })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Server error');
+
+      const link = data.link;
+      document.getElementById('generated-link').value = link;
+      document.getElementById('link-output').classList.remove('hidden');
+
+      if (smsStatusEl) {
+        smsStatusEl.textContent = execPhone
+          ? `✅ SMS sent to ${execPhone}`
+          : '📋 Copy or share the link below';
+        smsStatusEl.style.color = execPhone ? '#22c55e' : '#888';
+      }
+
+      const qrEl = document.getElementById('qr-code');
+      qrEl.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrEl, { text: link, width: 180, height: 180, colorDark: '#1a1a1a', colorLight: '#ffffff' });
+      }
+
+      setTimeout(() => document.getElementById('link-output').scrollIntoView({ behavior: 'smooth' }), 100);
+
+    } catch(err) {
+      console.error('generateExecLink error:', err);
+      if (smsStatusEl) { smsStatusEl.textContent = '❌ Failed — ' + err.message; smsStatusEl.style.color = '#ef4444'; }
+      alert('Could not create link: ' + err.message);
+    }
+  }
+
+  async _sendExecLinkSMS(execPhone, execLink, otp, customerName) {
+    const smsStatusEl = document.getElementById('sms-status');
+    if (smsStatusEl) {
+      smsStatusEl.textContent = '📤 Sending SMS...';
+      smsStatusEl.style.color = '#888';
+    }
+    try {
+      const res = await fetch('/api/sms/send-exec-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ execPhone, execLink, otp, customerName }),
+      });
+      const data = await res.json();
+      if (smsStatusEl) {
+        if (data.success) {
+          smsStatusEl.textContent = `✅ SMS sent to ${execPhone}`;
+          smsStatusEl.style.color = '#22c55e';
+        } else {
+          smsStatusEl.textContent = `⚠️ SMS failed — share the link manually`;
+          smsStatusEl.style.color = '#ef4444';
+        }
+      }
+    } catch (e) {
+      if (smsStatusEl) {
+        smsStatusEl.textContent = '⚠️ SMS failed — share manually';
+        smsStatusEl.style.color = '#ef4444';
+      }
+    }
+  }
+
   async confirmAndPlaceOrder() {
     try {
       document.getElementById('confirm-order-btn').disabled = true;
@@ -1163,9 +1380,10 @@ class DoorPilotApp {
     // Voice page events
     this.setupVoiceRecording();
 
-    // Review page events
+    // Review page — go to link generation settings
     document.getElementById('confirm-order-btn').addEventListener('click', () => {
-      this.confirmAndPlaceOrder();
+      this.showPage('linkgen');
+      this.initLinkGen();
     });
 
     document.getElementById('back-btn').addEventListener('click', () => {

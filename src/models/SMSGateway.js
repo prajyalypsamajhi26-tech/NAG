@@ -1,5 +1,5 @@
 // ==================== SMS Gateway ====================
-// Supports: Twilio (real), or simulated (console log)
+// Supports: Fast2SMS (India), Twilio, TextBelt, or simulated
 
 class SMSGateway {
   constructor() {
@@ -8,18 +8,52 @@ class SMSGateway {
 
   async sendSMS(phoneNumber, message) {
     console.log(`[SMS] → ${phoneNumber}: ${message}`);
-
     try {
-      if (this.provider === 'twilio') {
-        return await this._sendViaTwilio(phoneNumber, message);
-      } else if (this.provider === 'textbelt') {
-        return await this._sendViaTextBelt(phoneNumber, message);
-      }
+      if (this.provider === 'fast2sms') return await this._sendViaFast2SMS(phoneNumber, message);
+      if (this.provider === 'twilio')   return await this._sendViaTwilio(phoneNumber, message);
+      if (this.provider === 'textbelt') return await this._sendViaTextBelt(phoneNumber, message);
       return await this._simulate(phoneNumber, message);
     } catch (err) {
       console.error('[SMS] Send failed:', err.message);
-      // Always fall back to simulation so the app doesn't break
       return await this._simulate(phoneNumber, message);
+    }
+  }
+
+  // ── Fast2SMS (India) ─────────────────────────────────────────────────────
+  // Sign up free at https://www.fast2sms.com — get API key from Dashboard
+  // Add to .env:  SMS_PROVIDER=fast2sms  FAST2SMS_API_KEY=your_key_here
+  async _sendViaFast2SMS(phoneNumber, message) {
+    const apiKey = process.env.FAST2SMS_API_KEY;
+    if (!apiKey || apiKey === 'your_fast2sms_api_key_here') {
+      console.warn('[Fast2SMS] API key not set — falling back to simulation');
+      return this._simulate(phoneNumber, message);
+    }
+
+    // Strip country code — Fast2SMS needs 10-digit Indian numbers
+    const num = String(phoneNumber).replace(/^\+91/, '').replace(/\D/g, '').slice(-10);
+
+    const res = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+      method: 'POST',
+      headers: {
+        'authorization': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        route: 'q',          // quick/transactional route
+        message,
+        language: 'english',
+        flash: 0,
+        numbers: num,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.return) {
+      console.log(`[Fast2SMS] Sent! request_id: ${data.request_id}`);
+      return { success: true, provider: 'fast2sms', messageId: data.request_id };
+    } else {
+      console.error('[Fast2SMS] Failed:', data.message);
+      return this._simulate(phoneNumber, message);
     }
   }
 
