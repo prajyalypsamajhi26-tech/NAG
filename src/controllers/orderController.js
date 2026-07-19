@@ -139,28 +139,6 @@ const ITEMS_CATALOG = {
     { id: 'multivit-01',     name: 'Multivitamin Tablets - 30', price: 180, img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
     { id: 'zinc-01',         name: 'Zinc Supplement 25 tabs',   price: 90,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
     { id: 'glucose-strip-01',name: 'Glucose Test Strips 25pcs', price: 220, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&auto=format&fit=crop' }
-  ],
-  "📄 Documents": [
-    { id: 'print-01',       name: 'Document Printing - A4',     price: 5,   img: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=400&auto=format&fit=crop' },
-    { id: 'envelope-01',    name: 'Courier Envelope - A4',      price: 15,  img: 'https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=400&auto=format&fit=crop' },
-    { id: 'stamp-01',       name: 'Postage Stamp',              price: 10,  img: 'https://images.unsplash.com/photo-1579273166152-d725a4e2b755?w=400&auto=format&fit=crop' },
-    { id: 'folder-01',      name: 'Document Folder',            price: 30,  img: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&auto=format&fit=crop' },
-    { id: 'pen-01',         name: 'Ball Pen - Pack of 5',       price: 30,  img: 'https://images.unsplash.com/photo-1585336261026-6757c54e3ed7?w=400&auto=format&fit=crop' },
-    { id: 'stapler-01',     name: 'Mini Stapler with Pins',     price: 85,  img: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400&auto=format&fit=crop' },
-    { id: 'tape-01',        name: 'Clear Tape - 2 rolls',       price: 25,  img: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=400&auto=format&fit=crop' },
-    { id: 'highlighter-01', name: 'Highlighter - 4 colours',    price: 60,  img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=400&auto=format&fit=crop' },
-    { id: 'sticky-01',      name: 'Sticky Notes - 100 sheets',  price: 40,  img: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=400&auto=format&fit=crop' },
-    { id: 'notebook-01',    name: 'A5 Ruled Notebook',          price: 55,  img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop' },
-    { id: 'scissor-01',     name: 'Office Scissors',            price: 45,  img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop' },
-    { id: 'paperclip-01',   name: 'Paper Clips - 50 pcs',       price: 20,  img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&auto=format&fit=crop' },
-    { id: 'marker-01',      name: 'Permanent Markers - 2 pcs',  price: 40,  img: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=400&auto=format&fit=crop' },
-    { id: 'lamination-01',  name: 'Lamination Sheet - A4 x10',  price: 60,  img: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=400&auto=format&fit=crop' },
-    { id: 'bindingclip-01', name: 'Binder Clips - 12 pcs',      price: 35,  img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&auto=format&fit=crop' },
-    { id: 'rubber-01',      name: 'Eraser Pack - 5 pcs',        price: 15,  img: 'https://images.unsplash.com/photo-1585336261026-6757c54e3ed7?w=400&auto=format&fit=crop' },
-    { id: 'pencil-01',      name: 'HB Pencils - Pack of 10',    price: 40,  img: 'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?w=400&auto=format&fit=crop' },
-    { id: 'courier-bag-01', name: 'Padded Courier Bag - A4',    price: 25,  img: 'https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=400&auto=format&fit=crop' },
-    { id: 'whitener-01',    name: 'Correction Pen',             price: 30,  img: 'https://images.unsplash.com/photo-1585336261026-6757c54e3ed7?w=400&auto=format&fit=crop' },
-    { id: 'scale-01',       name: '30cm Ruler',                 price: 20,  img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&auto=format&fit=crop' }
   ]
 };
 

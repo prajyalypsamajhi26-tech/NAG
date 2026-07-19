@@ -287,28 +287,6 @@ class DoorPilotApp {
           { id: 'multivit-01',     name: 'Multivitamin Tablets - 30', price: 180, img: 'https://images.pexels.com/photos/159211/headache-pain-pills-medication-159211.jpeg?auto=compress&cs=tinysrgb&w=400' },
           { id: 'zinc-01',         name: 'Zinc Supplement 25 tabs',   price: 90,  img: 'https://images.pexels.com/photos/159211/headache-pain-pills-medication-159211.jpeg?auto=compress&cs=tinysrgb&w=400' },
           { id: 'glucose-strip-01',name: 'Glucose Test Strips 25pcs', price: 220, img: 'https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg?auto=compress&cs=tinysrgb&w=400' }
-        ],
-        "📄 Documents": [
-          { id: 'print-01',       name: 'Document Printing - A4',    price: 5,   img: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'envelope-01',    name: 'Courier Envelope - A4',     price: 15,  img: 'https://images.pexels.com/photos/1591062/pexels-photo-1591062.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'stamp-01',       name: 'Postage Stamp',             price: 10,  img: 'https://images.pexels.com/photos/1591062/pexels-photo-1591062.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'folder-01',      name: 'Document Folder',           price: 30,  img: 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'pen-01',         name: 'Ball Pen - Pack of 5',      price: 30,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'stapler-01',     name: 'Mini Stapler with Pins',    price: 85,  img: 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'tape-01',        name: 'Clear Tape - 2 rolls',      price: 25,  img: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'highlighter-01', name: 'Highlighter - 4 colours',   price: 60,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'sticky-01',      name: 'Sticky Notes - 100 sheets', price: 40,  img: 'https://images.pexels.com/photos/4057758/pexels-photo-4057758.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'notebook-01',    name: 'A5 Ruled Notebook',         price: 55,  img: 'https://images.pexels.com/photos/1925536/pexels-photo-1925536.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'scissor-01',     name: 'Office Scissors',           price: 45,  img: 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'paperclip-01',   name: 'Paper Clips - 50 pcs',      price: 20,  img: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'marker-01',      name: 'Permanent Markers - 2 pcs', price: 40,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'lamination-01',  name: 'Lamination Sheet - A4 x10', price: 60,  img: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'bindingclip-01', name: 'Binder Clips - 12 pcs',     price: 35,  img: 'https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'rubber-01',      name: 'Eraser Pack - 5 pcs',       price: 15,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'pencil-01',      name: 'HB Pencils - Pack of 10',   price: 40,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'courier-bag-01', name: 'Padded Courier Bag - A4',   price: 25,  img: 'https://images.pexels.com/photos/1591062/pexels-photo-1591062.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'whitener-01',    name: 'Correction Pen',            price: 30,  img: 'https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=400' },
-          { id: 'scale-01',       name: '30cm Ruler',                price: 20,  img: 'https://images.pexels.com/photos/4057758/pexels-photo-4057758.jpeg?auto=compress&cs=tinysrgb&w=400' }
         ]
       };
     }
@@ -357,8 +335,7 @@ class DoorPilotApp {
         '🍿 Snacks': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l-2 12H8L6 8z"/><path d="M5 8c0-1.5 1.5-4 3-4s2 1.5 3 1.5S13 4 14 4s3 2.5 3 4"/><line x1="12" y1="8" x2="12" y2="20"/></svg>`,
         '🍪 Cookies': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="8" r="1" fill="currentColor"/><circle cx="15" cy="14" r="1" fill="currentColor"/><circle cx="10" cy="15" r="1" fill="currentColor"/></svg>`,
         '🥤 Beverages': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14l-2 16H7L5 3z"/><path d="M5 8h14"/></svg>`,
-        '💊 Medicines': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7.07-7.07l7 7a5 5 0 0 1-7.07 7.07z"/><line x1="7" y1="7" x2="17" y2="17"/></svg>`,
-        '📄 Documents': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`
+        '💊 Medicines': `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5L3.5 13.5a5 5 0 0 1 7.07-7.07l7 7a5 5 0 0 1-7.07 7.07z"/><line x1="7" y1="7" x2="17" y2="17"/></svg>`
       };
 
       const icon = catIcons[category] || catIcons['all'];
