@@ -120,25 +120,26 @@ const ITEMS_CATALOG = {
     { id: 'water-500-01',  name: 'Mineral Water - 500ml',      price: 15,  img: 'https://images.pexels.com/photos/327090/pexels-photo-327090.jpeg?auto=compress&cs=tinysrgb&w=400' }
   ],
   "💊 Medicines": [
-    { id: 'bandaid-01',      name: 'Band-Aid Flex 100pcs',      price: 35,  img: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400&auto=format&fit=crop' },
-    { id: 'cough-01',        name: 'Benadryl Cough Syrup',      price: 85,  img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
-    { id: 'sanitizer-01',    name: 'Hand Sanitizer 100ml',      price: 60,  img: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&auto=format&fit=crop' },
-    { id: 'vitaminc-01',     name: 'Vitamin C 500mg',           price: 50,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-    { id: 'antacid-01',      name: 'Antacid Syrup 200ml',       price: 75,  img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
-    { id: 'ibuprofen-01',    name: 'Ibuprofen 400mg - 10 tabs', price: 30,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-    { id: 'thermometer-01',  name: 'Digital Thermometer',       price: 250, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&auto=format&fit=crop' },
-    { id: 'mask-01',         name: 'N95 Face Mask - 5 pcs',     price: 120, img: 'https://images.unsplash.com/photo-1586942593568-29364ef8858b?w=400&auto=format&fit=crop' },
-    { id: 'eyedrops-01',     name: 'Lubricant Eye Drops',       price: 90,  img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
-    { id: 'ors-01',          name: 'ORS Sachets - 5 pcs',       price: 40,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-    { id: 'antifungal-01',   name: 'Antifungal Cream 15g',      price: 65,  img: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&auto=format&fit=crop' },
+    { id: 'paracetamol-01',  name: 'Paracetamol 650mg',         price: 25,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
+    { id: 'bandaid-01',      name: 'Band-Aid Flex 100pcs',      price: 35,  img: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=400&auto=format&fit=crop' },
+    { id: 'cough-01',        name: 'Benadryl Cough Syrup',      price: 85,  img: '/images/cough_syrup.png' },
+    { id: 'sanitizer-01',    name: 'Hand Sanitizer 100ml',      price: 60,  img: '/images/hand_sanitizer.png' },
+    { id: 'vitaminc-01',     name: 'Vitamin C 500mg',           price: 50,  img: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=400&auto=format&fit=crop' },
+    { id: 'antacid-01',      name: 'Antacid Syrup 200ml',       price: 75,  img: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=400&auto=format&fit=crop' },
+    { id: 'ibuprofen-01',    name: 'Ibuprofen 400mg - 10 tabs', price: 30,  img: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=400&auto=format&fit=crop' },
+    { id: 'thermometer-01',  name: 'Digital Thermometer',       price: 250, img: '/images/digital_thermometer.png' },
+    { id: 'mask-01',         name: 'N95 Face Mask - 5 pcs',     price: 120, img: '/images/n95_mask.png' },
+    { id: 'eyedrops-01',     name: 'Lubricant Eye Drops',       price: 90,  img: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400&auto=format&fit=crop' },
+    { id: 'ors-01',          name: 'ORS Sachets - 5 pcs',       price: 40,  img: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop' },
+    { id: 'antifungal-01',   name: 'Antifungal Cream 15g',      price: 65,  img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop' },
     { id: 'bp-tablet-01',    name: 'Aspirin 75mg - 14 tabs',    price: 45,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-    { id: 'nasal-01',        name: 'Nasal Drops 10ml',          price: 55,  img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
-    { id: 'glucon-01',       name: 'Glucon-D Energy Drink',     price: 70,  img: 'https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=400&auto=format&fit=crop' },
+    { id: 'nasal-01',        name: 'Nasal Drops 10ml',          price: 55,  img: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400&auto=format&fit=crop' },
+    { id: 'glucon-01',       name: 'Glucon-D Energy Drink',     price: 70,  img: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&auto=format&fit=crop' },
     { id: 'cotton-01',       name: 'Surgical Cotton - 50g',     price: 30,  img: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400&auto=format&fit=crop' },
-    { id: 'vicks-01',        name: 'Vicks VapoRub 25g',         price: 55,  img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
-    { id: 'multivit-01',     name: 'Multivitamin Tablets - 30', price: 180, img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
+    { id: 'vicks-01',        name: 'Vicks VapoRub 25g',         price: 55,  img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&auto=format&fit=crop' },
+    { id: 'multivit-01',     name: 'Multivitamin Tablets - 30', price: 180, img: 'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&auto=format&fit=crop' },
     { id: 'zinc-01',         name: 'Zinc Supplement 25 tabs',   price: 90,  img: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-    { id: 'glucose-strip-01',name: 'Glucose Test Strips 25pcs', price: 220, img: 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=400&auto=format&fit=crop' }
+    { id: 'glucose-strip-01',name: 'Glucose Test Strips 25pcs', price: 220, img: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&auto=format&fit=crop' }
   ]
 };
 
