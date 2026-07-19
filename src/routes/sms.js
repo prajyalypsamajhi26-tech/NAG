@@ -27,8 +27,6 @@ router.post('/send-exec-link', async (req, res) => {
   }
 });
 
-const smsGateway = require('../models/SMSGateway');
-
 // POST /api/sms/send-test - Test endpoint to verify SMS sending
 router.post('/send-test', async (req, res) => {
   const { phone, message } = req.body;
