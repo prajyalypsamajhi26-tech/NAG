@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#12121f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="DoorPilot Executive - Step-by-step turn-by-turn delivery guide for delivery partners">
+  <title>DoorPilot Executive — Delivery Navigation</title>
+
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛵</text></svg>">
+
+  <!-- Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+    :root {
+      --bg-dark: #12121f;
+      --bg-card: #ffffff;
+      --primary: #FFB800;
+      --primary-hover: #ffa700;
+      --primary-light: #fff8e5;
+      --text-dark: #12121f;
+      --text-muted: #64748b;
+      --accent-blue: #3b82f6;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+      --shadow-glow: 0 0 20px rgba(255, 184, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: #0c0c16; color: var(--text-dark); overflow: hidden; }
+
+    /* ── Screen Containers ── */
+    .screen { display: none; height: 100vh; flex-direction: column; width: 100%; position: relative; }
+    .screen.active { display: flex; }
+
+    /* ── Header ── */
+    .exec-header {
+      background: var(--bg-dark);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 10px; }
+    .brand-icon {
+      width: 38px; height: 38px; background: linear-gradient(135deg, #FFD440, #FFB800);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; box-shadow: var(--shadow-glow);
+    }
+    .exec-brand { font-family: 'Fredoka One', cursive; font-size: 24px; color: #ffffff; letter-spacing: -0.5px; }
+    .exec-sub { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.8px; margin-top: -2px; }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn {
+      position: relative; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+      color: #fff; cursor: pointer; transition: all 0.2s ease;
+    }
+    .icon-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
+    .icon-btn svg { width: 18px; height: 18px; stroke: var(--primary); stroke-width: 2.2; fill: none; }
+    .badge-dot {
+      position: absolute; top: 2px; right: 2px; width: 10px; height: 10px;
+      background: var(--accent-red); border-radius: 50%; border: 2px solid var(--bg-dark); display: none;
+    }
+    .step-badge {
+      background: rgba(255, 184, 0, 0.15); border: 1px solid rgba(255, 184, 0, 0.4);
+      color: var(--primary); font-size: 12px; font-weight: 800; padding: 6px 14px;
+      border-radius: 50px; letter-spacing: 0.3px;
+    }
+
+    /* ── Map Container ── */
+    .map-wrap { position: relative; flex-shrink: 0; height: 44vh; width: 100%; }
+    #exec-map { width: 100%; height: 100%; background: #1a1a2e; z-index: 1; }
+
+    /* Map Distance Overlay */
+    .map-overlay-badge {
+      position: absolute; top: 12px; left: 12px; z-index: 500;
+      background: rgba(18, 18, 31, 0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12); padding: 8px 14px; border-radius: 50px;
+      display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .map-overlay-badge .dot-live { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: pulseGlow 1.5s infinite; }
+    @keyframes pulseGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
+    /* Floating Recenter Button */
+    .map-recenter-btn {
+      position: absolute; top: 12px; right: 12px; z-index: 500;
+      background: rgba(18, 18, 31, 0.88); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12); width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: var(--primary);
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: transform 0.2s;
+    }
+    .map-recenter-btn:active { transform: scale(0.9); }
+    .map-recenter-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+    /* Floating Voice Sticky Bar */
+    .voice-sticky {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 500;
+      background: rgba(18, 18, 31, 0.92); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.1); padding: 10px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .voice-waves { display: flex; gap: 3px; align-items: center; height: 16px; }
+    .voice-wave-bar { width: 3px; height: 100%; background: var(--primary); border-radius: 3px; opacity: 0.6; }
+    .voice-sticky.playing .voice-wave-bar { animation: wave 0.8s ease-in-out infinite alternate; }
+    .voice-sticky.playing .voice-wave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .voice-sticky.playing .voice-wave-bar:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes wave { 0% { height: 20%; } 100% { height: 100%; opacity: 1; } }
+
+    .voice-info { flex: 1; }
+    .voice-title { font-size: 13px; font-weight: 800; color: #fff; }
+    .voice-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+    .voice-play {
+      width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #FFD440, #FFB800);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: var(--shadow-glow); transition: transform 0.15s;
+    }
+    .voice-play:active { transform: scale(0.92); }
+    .voice-play svg { width: 20px; height: 20px; fill: var(--text-dark); margin-left: 2px; }
+
+    /* ── Bottom Panel & Cards ── */
+    .bottom-panel {
+      flex: 1; background: #f8fafc; border-top-left-radius: 24px; border-top-right-radius: 24px;
+      margin-top: -16px; z-index: 10; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+    }
+
+    .dots-container { display: flex; justify-content: center; gap: 8px; padding: 12px 0 4px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .dot.on { background: var(--primary); transform: scale(1.5); width: 22px; border-radius: 10px; }
+    .dot.done { background: var(--accent-green); }
+
+    .step-card { flex: 1; padding: 12px 18px 8px; overflow-y: auto; }
+    .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .step-icon-wrap {
+      width: 44px; height: 44px; border-radius: 14px; background: var(--bg-dark);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(18, 18, 31, 0.2);
+    }
+    .step-icon-wrap svg { width: 22px; height: 22px; stroke: var(--primary); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .step-meta { flex: 1; }
+    .step-num { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.8px; }
+    .step-title { font-size: 20px; font-weight: 900; color: var(--text-dark); letter-spacing: -0.4px; line-height: 1.2; }
+
+    .step-instr {
+      font-size: 14px; line-height: 1.6; color: #1e293b; background: var(--primary-light);
+      border-left: 4px solid var(--primary); border-radius: 0 12px 12px 0;
+      padding: 12px 16px; margin-bottom: 12px; font-weight: 600;
+    }
+
+    .step-photo-wrap {
+      position: relative; margin-bottom: 12px; border-radius: 16px; overflow: hidden;
+      border: 1.5px solid #e2e8f0; background: #0f172a; cursor: pointer;
+      box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .step-photo-wrap:active { transform: scale(0.98); }
+    .step-photo {
+      width: 100%; max-height: 260px; object-fit: contain; display: block;
+      background: #0f172a; border-radius: 14px;
+    }
+    .step-photo-badge {
+      position: absolute; bottom: 8px; right: 8px; background: rgba(18, 18, 31, 0.85);
+      backdrop-filter: blur(6px); color: var(--primary); font-size: 11px; font-weight: 800;
+      padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px;
+      border: 1px solid rgba(255, 184, 0, 0.3);
+    }
+
+    /* Fullscreen Image Lightbox Modal */
+    .img-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.94); backdrop-filter: blur(10px);
+      z-index: 3500; display: none; align-items: center; justify-content: center; padding: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+    .img-modal-overlay.open { display: flex; }
+    .img-modal-content {
+      max-width: 96vw; max-height: 88vh; border-radius: 16px; object-fit: contain;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.6); border: 2px solid rgba(255, 184, 0, 0.5);
+    }
+    .img-modal-close {
+      position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.15);
+      color: #fff; border: 1px solid rgba(255,255,255,0.25); width: 44px; height: 44px;
+      border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; backdrop-filter: blur(4px); transition: transform 0.15s;
+    }
+    .img-modal-close:active { transform: scale(0.9); }
+
+    /* Details Grid Chips */
+    .details-chips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .chip-item {
+      background: #ffffff; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 12px;
+      display: flex; flex-direction: column; gap: 2px; box-shadow: var(--shadow-sm);
+    }
+    .chip-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .chip-value { font-size: 13px; font-weight: 800; color: var(--text-dark); }
+
+    /* ── Prev / Next Navigation Row ── */
+    .nav-row { display: flex; gap: 10px; padding: 8px 18px; background: #ffffff; border-top: 1px solid #f1f5f9; }
+    .nav-btn {
+      flex: 1; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s ease; border: none;
+    }
+    .nav-prev { background: #f1f5f9; color: #475569; }
+    .nav-prev:disabled { opacity: 0.4; cursor: not-allowed; }
+    .nav-next { background: var(--bg-dark); color: var(--primary); box-shadow: 0 4px 16px rgba(18, 18, 31, 0.25); }
+    .nav-next:active { transform: scale(0.98); }
+
+    /* ── Quick Action Dock ── */
+    .act-row { display: flex; gap: 8px; padding: 8px 18px 14px; background: #ffffff; }
+    .act {
+      flex: 1; padding: 12px 6px; border: none; border-radius: 14px;
+      font-size: 11px; font-weight: 900; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+      transition: all 0.2s ease; min-height: 58px; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .act:active { transform: scale(0.95); }
+    .act svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .act-near { background: var(--primary); color: var(--bg-dark); }
+    .act-done { background: #1a1a2e; color: var(--primary); }
+    .act-wrong { background: #fee2e2; color: var(--accent-red); border: 1px solid #fca5a5; }
+
+    /* ── Arrived Screen ── */
+    #arrived-screen {
+      background: linear-gradient(180deg, #FFB800 0%, #FFA000 100%);
+      align-items: center; justify-content: center; text-align: center; padding: 40px 24px; color: var(--bg-dark);
+    }
+    .arr-ring {
+      width: 110px; height: 110px; border-radius: 50%; background: var(--bg-dark);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3); animation: pop 0.6s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+    }
+    @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .arr-ring svg { width: 54px; height: 54px; stroke: var(--primary); fill: none; stroke-width: 2.5; }
+    .arr-title { font-size: 32px; font-weight: 900; margin-bottom: 6px; }
+    .arr-flat { font-family: 'Fredoka One', cursive; font-size: 60px; line-height: 1; margin: 12px 0 16px; color: var(--bg-dark); text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .arr-sub { font-size: 15px; font-weight: 600; opacity: 0.85; margin-bottom: 36px; max-width: 300px; }
+    .bell-btn {
+      padding: 18px 48px; background: var(--bg-dark); color: var(--primary);
+      border: none; border-radius: 50px; font-size: 18px; font-weight: 900;
+      cursor: pointer; display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 10px 30px rgba(18, 18, 31, 0.4); transition: transform 0.2s;
+    }
+    .bell-btn:active { transform: scale(0.95); }
+
+    /* ── Expired Screen ── */
+    #expired-screen { background: #ffffff; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; }
+    .exp-icon { font-size: 64px; margin-bottom: 16px; }
+    .exp-title { font-size: 24px; font-weight: 900; color: var(--accent-red); margin-bottom: 8px; }
+    .exp-sub { font-size: 15px; color: var(--text-muted); max-width: 320px; line-height: 1.5; }
+
+    /* ── Dispatch Drawer Sheet ── */
+    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 2000; display: none; }
+    .sheet-overlay.open { display: block; }
+    .sheet {
+      position: fixed; left: 0; right: 0; bottom: 0; background: #ffffff; border-radius: 24px 24px 0 0;
+      z-index: 2001; max-height: 75vh; display: flex; flex-direction: column; transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+    }
+    .sheet.open { transform: translateY(0); }
+    .sheet-head { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; }
+    .sheet-title { font-weight: 900; color: var(--bg-dark); font-size: 17px; }
+    .sheet-close { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    .thread { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; background: #f8fafc; }
+    .msg-bubble { max-width: 82%; padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; font-weight: 500; }
+    .msg-out { align-self: flex-end; background: var(--bg-dark); color: var(--primary); border-bottom-right-radius: 4px; }
+    .msg-in { align-self: flex-start; background: #ffffff; color: var(--text-dark); border-bottom-left-radius: 4px; box-shadow: var(--shadow-sm); border: 1px solid #e2e8f0; }
+    .msg-empty { color: var(--text-muted); font-size: 13px; text-align: center; padding: 30px 0; font-weight: 600; }
+
+    .composer { display: flex; gap: 10px; padding: 14px 16px; border-top: 1px solid #f1f5f9; background: #ffffff; }
+    .composer input { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 30px; padding: 12px 18px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .composer input:focus { border-color: var(--primary); }
+    .composer button { background: var(--primary); color: var(--bg-dark); border: none; border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); }
+
+    .quick-row { display: flex; gap: 8px; padding: 8px 16px 12px; flex-wrap: wrap; background: #ffffff; }
+    .quick-chip { background: var(--primary-light); border: 1px solid rgba(255,184,0,0.5); color: #92400e; font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 20px; cursor: pointer; transition: transform 0.15s; }
+    .quick-chip:active { transform: scale(0.94); }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+      background: rgba(18, 18, 31, 0.95); backdrop-filter: blur(8px); color: #fff;
+      padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 700;
+      z-index: 9999; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1); animation: toastUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes toastUp { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- Nav Screen -->
+  <div id="nav-screen" class="screen active">
+
+    <!-- Header Bar -->
+    <div class="exec-header">
+      <div class="brand-wrap">
+        <div class="brand-icon">🛵</div>
+        <div>
+          <div class="exec-brand">DoorPilot</div>
+          <div class="exec-sub">Executive Guide</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Call Customer Button (if phone exists) -->
+        <button id="call-cust-btn" class="icon-btn" title="Call Customer" style="display:none">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
+
+        <!-- Dispatch Chat Button -->
+        <button id="msg-bell-btn" class="icon-btn" title="Message Dispatch">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span id="msg-badge" class="badge-dot"></span>
+        </button>
+
+        <span class="step-badge" id="step-badge">Step 1 of 4</span>
+      </div>
+    </div>
+
+    <!-- Map Wrap -->
+    <div class="map-wrap">
+      <div id="exec-map"></div>
+
+      <!-- Distance Overlay -->
+      <div class="map-overlay-badge" id="distance-badge">
+        <div class="dot-live"></div>
+        <span id="distance-text">Calculating route...</span>
+      </div>
+
+      <!-- Recenter Button -->
+      <button class="map-recenter-btn" id="recenter-btn" title="Center on Destination">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+
+      <!-- Voice Guidance Sticky Bar -->
+      <div class="voice-sticky" id="voice-bar" style="display:none">
+        <div class="voice-waves">
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+          <div class="voice-wave-bar"></div>
+        </div>
+        <div class="voice-info">
+          <div class="voice-title">Customer Voice Note</div>
+          <div class="voice-sub">Tap to play audio guidance</div>
+        </div>
+        <button class="voice-play" id="voice-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <audio id="voice-audio" style="display:none"></audio>
+      </div>
+    </div>
+
+    <!-- Bottom Panel -->
+    <div class="bottom-panel">
+      <div class="dots-container" id="dots"></div>
+      <div class="step-card" id="step-card"></div>
+
+      <!-- Prev / Next Navigation Row -->
+      <div class="nav-row">
+        <button class="nav-btn nav-prev" id="prev-btn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Prev
+        </button>
+        <button class="nav-btn nav-next" id="next-btn">
+          Next Step
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+      <!-- Quick Action Dock -->
+      <div class="act-row">
+        <button class="act act-near" id="near-btn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          I'm Near
+        </button>
+        <button class="act act-done" id="done-btn">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Done, Next
+        </button>
+        <button class="act act-wrong" id="wrong-btn">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Dispatch / Issue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrived Screen -->
+  <div id="arrived-screen" class="screen">
+    <div class="arr-ring">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="arr-title">You've Arrived!</div>
+    <div class="arr-flat" id="arr-flat">—</div>
+    <div class="arr-sub">Ring the bell and complete the door delivery.</div>
+    <button class="bell-btn" id="bell-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Ring the Bell 🔔
+    </button>
+  </div>
+
+  <!-- Expired Screen -->
+  <div id="expired-screen" class="screen" style="display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:30px;text-align:center;background:#12121f;color:#fff;">
+    <div class="exp-icon" style="font-size:54px;margin-bottom:16px;">🛵</div>
+    <div class="exp-title" style="font-size:22px;font-weight:800;color:#FFD440;margin-bottom:10px;">DoorPilot Delivery Guide</div>
+    <div class="exp-sub" style="font-size:14px;color:#94a3b8;max-width:320px;line-height:1.5;">Please click or copy the full delivery link received in your SMS (e.g. http://192.168.1.8:3000/exec/WURUD8DY).</div>
+  </div>
+
+  <!-- Dispatch Inbox Sheet -->
+  <div class="sheet-overlay" id="sheet-overlay"></div>
+  <div class="sheet" id="msg-sheet">
+    <div class="sheet-head">
+      <span class="sheet-title">💬 Message Dispatch & Customer</span>
+      <button class="sheet-close" id="sheet-close-btn">✕</button>
+    </div>
+    <div class="thread" id="thread"></div>
+    <div class="quick-row">
+      <button class="quick-chip" data-msg="Gate is locked, need entry help">Gate locked</button>
+      <button class="quick-chip" data-msg="Customer not answering door/phone">No answer</button>
+      <button class="quick-chip" data-msg="Wrong address or landmark confusing">Wrong address</button>
+      <button class="quick-chip" data-msg="I'm running late by 5 mins">Running late</button>
+    </div>
+    <div class="composer">
+      <input id="msg-input" type="text" placeholder="Type message to dispatch…" maxlength="200">
+      <button id="msg-send-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12121f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div class="img-modal-overlay" id="img-modal-overlay" onclick="closeImageModal()">
+    <button class="img-modal-close" onclick="closeImageModal()">✕</button>
+    <img class="img-modal-content" id="img-modal-content" src="" alt="Full landmark photo" onclick="event.stopPropagation()">
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    let DATA = null;
+    let SHORT_ID = null;
+
+    function openImageModal(src) {
+      const overlay = document.getElementById('img-modal-overlay');
+      const img = document.getElementById('img-modal-content');
+      if (overlay && img) {
+        img.src = src;
+        overlay.classList.add('open');
+      }
+    }
+
+    function closeImageModal() {
+      const overlay = document.getElementById('img-modal-overlay');
+      if (overlay) overlay.classList.remove('open');
+    }
+
+    function show(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+    }
+
+    function toast(msg, ms = 3000) {
+      document.querySelectorAll('.toast').forEach(t => t.remove());
+      const t = document.createElement('div');
+      t.className = 'toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), ms);
+    }
+
+    // ── Load Delivery Data from Server ──────────────────────────────────────
+    async function loadData() {
+      const parts = location.pathname.split('/').filter(Boolean);
+      let rawId = parts[parts.length - 1] || '';
+      // Strip any accidental trailing punctuation like '!' or '.' from URL
+      const shortId = rawId.replace(/[^a-zA-Z0-9]/g, '');
+      SHORT_ID = shortId;
+
+      if (!shortId || shortId === 'exec.html') {
+        try {
+          const h = location.hash.slice(1);
+          if (!h) throw new Error('no id');
+          DATA = JSON.parse(decodeURIComponent(escape(atob(h))));
+          startApp();
+        } catch (e) {
+          showExpired('Invalid Delivery Link', 'No valid delivery payload found in link.');
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/exec-links/${shortId}`);
+        if (res.status === 404) { showExpired('Link Not Found', 'This delivery link is invalid or removed.'); return; }
+        if (res.status === 410) { showExpired('Link Expired', 'Ask the customer to generate a new link.'); return; }
+        const json = await res.json();
+        if (!json.success) { showExpired('Error', json.error); return; }
+        DATA = json.payload;
+        startApp();
+      } catch (e) {
+        showExpired('Connection Error', 'Could not fetch delivery details. Please check connection.');
+      }
+    }
+
+    function showExpired(title, sub) {
+      show('expired-screen');
+      document.querySelector('.exp-title').textContent = title;
+      document.querySelector('.exp-sub').textContent = sub;
+    }
+
+    function startApp() {
+      if (DATA.exp && Date.now() > DATA.exp) {
+        showExpired('Link Expired', 'Ask the customer to generate a new one.');
+      } else {
+        // Direct launch to turn-by-turn navigation (bypassing mandatory initial OTP)
+        show('nav-screen');
+        initNav();
+      }
+    }
+
+    loadData();
+
+    // ── Turn-by-Turn Navigation Logic ────────────────────────────────────────
+    let steps = [], cur = 0, map = null, custMarker = null, myMarker = null, myLine = null;
+
+    const STEP_ICONS = {
+      area: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+      gate: '<rect x="4" y="3" width="16" height="18" rx="1"/><line x1="4" y1="12" x2="20" y2="12"/>',
+      building: '<path d="M3 21h18M6 21V8l6-4 6 4v13M10 21v-6h4v6"/>',
+      floor: '<polyline points="4 8 12 3 20 8"/><line x1="4" y1="14" x2="20" y2="14"/><line x1="4" y1="20" x2="20" y2="20"/>',
+      flat: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+    };
+
+    function buildSteps(d) {
+      const s = [];
+      if (d.colony || d.landmarks)
+        s.push({ name: d.colony || 'Find Area', instr: d.landmarks || `Head to ${d.colony || 'the colony'}`, img: null, icon: 'area' });
+      if (d.gate)
+        s.push({ name: `Gate ${d.gate}`, instr: `Enter through Gate ${d.gate}`, img: null, icon: 'gate' });
+      s.push({ name: d.apt || 'Enter Building', instr: d.instr || 'Proceed to building entrance', img: d.img || null, icon: 'building' });
+      if (d.floor)
+        s.push({ name: `${d.lift ? 'Lift to' : 'Climb to'} Floor ${d.floor}`, instr: d.lift ? `Take the elevator/lift to floor ${d.floor}` : `Use stairs to floor ${d.floor}`, img: null, icon: 'floor' });
+      s.push({
+        name: d.flat ? `Flat ${d.flat}` : 'Door Destination',
+        instr: [d.color && `Door Color: ${d.color}`, d.intercom && `Intercom Code: ${d.intercom}`, !d.ghost && d.name && `Customer: ${d.name}`].filter(Boolean).join(' • ') || 'You are at the final door',
+        img: null, final: true, icon: 'flat'
+      });
+      return s;
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const d = R * c;
+      return d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
+    }
+
+    function initNav() {
+      steps = buildSteps(DATA);
+
+      // Customer Call Button setup
+      if (DATA.phone) {
+        const callBtn = document.getElementById('call-cust-btn');
+        callBtn.style.display = 'flex';
+        callBtn.onclick = () => window.open(`tel:${DATA.phone}`);
+      }
+
+      // Map Initialization
+      const lat = parseFloat(DATA.lat), lng = parseFloat(DATA.lng);
+      map = L.map('exec-map', { zoomControl: false, maxZoom: 20 }).setView([lat, lng], 17);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 20, maxNativeZoom: 19
+      }).addTo(map);
+
+      // Customer Animated House Pin
+      const custIcon = L.divIcon({
+        className: '',
+        html: `<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.3))">
+          <div style="width:52px;height:52px;background:linear-gradient(135deg,#FFD440,#FFB800);border:3px solid #12121f;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px rgba(255,184,0,0.25)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#12121f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div style="width:3px;height:12px;background:#12121f;margin-top:-1px"></div>
+          <div style="width:14px;height:5px;background:rgba(0,0,0,0.2);border-radius:50%"></div>
+        </div>`,
+        iconSize: [52, 70], iconAnchor: [26, 70], popupAnchor: [0, -72]
+      });
+
+      custMarker = L.marker([lat, lng], { icon: custIcon }).addTo(map)
+        .bindPopup(`<b>📍 ${!DATA.ghost && DATA.name ? DATA.name : 'Delivery Door'}</b><br>Flat ${DATA.flat || '—'}`)
+        .openPopup();
+
+      // Recenter button
+      document.getElementById('recenter-btn').onclick = () => {
+        if (map) map.setView([lat, lng], 17, { animate: true });
+      };
+
+      // Driver Live Location Tracking
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(pos => {
+          const { latitude: my, longitude: mx } = pos.coords;
+          const distStr = calculateDistance(my, mx, lat, lng);
+          document.getElementById('distance-text').textContent = `${distStr} to door`;
+
+          const myIcon = L.divIcon({
+            className: '',
+            html: `<div style="width:20px;height:20px;background:#3b82f6;border:3px solid #ffffff;border-radius:50%;box-shadow:0 0 0 6px rgba(59,130,246,0.3)"></div>`,
+            iconSize: [20, 20], iconAnchor: [10, 10]
+          });
+
+          if (!myMarker) {
+            myMarker = L.marker([my, mx], { icon: myIcon }).addTo(map).bindPopup('Your Location');
+            myLine = L.polyline([[my, mx], [lat, lng]], { color: '#3b82f6', weight: 4, dashArray: '8 6', opacity: 0.8 }).addTo(map);
+            map.fitBounds([[lat, lng], [my, mx]], { padding: [50, 50] });
+          } else {
+            myMarker.setLatLng([my, mx]);
+            myLine.setLatLngs([[my, mx], [lat, lng]]);
+          }
+        }, err => {
+          document.getElementById('distance-text').textContent = `Destination pinned`;
+        }, { enableHighAccuracy: true });
+      }
+
+      // Voice Player Sticky Bar
+      if (DATA.voice) {
+        const vbar = document.getElementById('voice-bar');
+        vbar.style.display = 'flex';
+        const audio = document.getElementById('voice-audio');
+        audio.src = DATA.voice;
+        let playing = false;
+
+        document.getElementById('voice-play-btn').onclick = () => {
+          if (playing) {
+            audio.pause();
+            playing = false;
+            vbar.classList.remove('playing');
+          } else {
+            audio.play();
+            playing = true;
+            vbar.classList.add('playing');
+            audio.onended = () => { playing = false; vbar.classList.remove('playing'); };
+          }
+        };
+      }
+
+      // Progress Dots
+      const dotsEl = document.getElementById('dots');
+      dotsEl.innerHTML = steps.map((_, i) => `<div class="dot" id="d${i}"></div>`).join('');
+
+      // Buttons
+      document.getElementById('prev-btn').onclick = () => { if (cur > 0) { cur--; render(); } };
+      document.getElementById('next-btn').onclick = advance;
+      document.getElementById('done-btn').onclick = advance;
+
+      // Quick Actions
+      document.getElementById('near-btn').onclick = () => {
+        const phone = DATA.phone || '';
+        const body = encodeURIComponent("Hi! I'm your DoorPilot delivery executive — I'm almost at your door!");
+        window.open(`sms:${phone}?body=${body}`);
+        toast('📍 Pre-filled SMS ready to send to customer');
+      };
+
+      document.getElementById('wrong-btn').onclick = () => {
+        openSheet(`Issue at Step ${cur + 1} (${steps[cur].name}): `);
+      };
+
+      document.getElementById('msg-bell-btn').onclick = () => openSheet();
+      document.getElementById('sheet-close-btn').onclick = closeSheet;
+      document.getElementById('sheet-overlay').onclick = closeSheet;
+
+      document.querySelectorAll('.quick-chip').forEach(chip => {
+        chip.onclick = () => sendDispatchMsg(chip.dataset.msg);
+      });
+
+      document.getElementById('msg-send-btn').onclick = () => {
+        const input = document.getElementById('msg-input');
+        if (input.value.trim()) { sendDispatchMsg(input.value.trim()); input.value = ''; }
+      };
+
+      document.getElementById('msg-input').onkeydown = e => {
+        if (e.key === 'Enter') document.getElementById('msg-send-btn').click();
+      };
+
+      initMessaging();
+
+      document.getElementById('bell-btn').onclick = () => {
+        toast('🔔 Bell rung! Completing delivery...', 2500);
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 300]);
+      };
+
+      render();
+      setTimeout(() => map.invalidateSize(), 300);
+    }
+
+    function advance() {
+      if (cur < steps.length - 1) { cur++; render(); }
+      else { showArrived(); }
+    }
+
+    function render() {
+      const s = steps[cur], total = steps.length;
+      for (let i = 0; i < total; i++) {
+        const d = document.getElementById(`d${i}`);
+        if (d) d.className = 'dot' + (i < cur ? ' done' : i === cur ? ' on' : '');
+      }
+
+      document.getElementById('prev-btn').disabled = cur === 0;
+      const nb = document.getElementById('next-btn');
+      nb.innerHTML = cur === total - 1
+        ? 'Arrived ✓'
+        : `Next Step <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`;
+
+      // Render Step Details
+      document.getElementById('step-card').innerHTML = `
+        <div class="step-header">
+          <div class="step-icon-wrap">
+            <svg viewBox="0 0 24 24">${STEP_ICONS[s.icon] || ''}</svg>
+          </div>
+          <div class="step-meta">
+            <div class="step-num">Step ${cur + 1} of ${total}</div>
+            <div class="step-title">${s.name}</div>
+          </div>
+        </div>
+
+        <div class="step-instr">${s.instr}</div>
+
+        ${s.img ? `
+          <div class="step-photo-wrap" onclick="openImageModal('${s.img}')" title="Tap to view full image">
+            <img class="step-photo" src="${s.img}" alt="Landmark photo">
+            <div class="step-photo-badge">🔍 Tap for Fullscreen</div>
+          </div>
+        ` : ''}
+
+        <div class="details-chips">
+          ${DATA.flat ? `<div class="chip-item"><span class="chip-label">Flat / Unit</span><span class="chip-value">Flat ${DATA.flat}</span></div>` : ''}
+          ${DATA.color ? `<div class="chip-item"><span class="chip-label">Door Color</span><span class="chip-value">${DATA.color}</span></div>` : ''}
+          ${DATA.gate ? `<div class="chip-item"><span class="chip-label">Gate No.</span><span class="chip-value">Gate ${DATA.gate}</span></div>` : ''}
+          ${DATA.floor ? `<div class="chip-item"><span class="chip-label">Floor</span><span class="chip-value">Floor ${DATA.floor} ${DATA.lift ? '(Lift)' : ''}</span></div>` : ''}
+        </div>
+      `;
+
+      const badge = document.getElementById('step-badge');
+      if (badge) badge.textContent = `Step ${cur + 1} of ${total}`;
+
+      if (map) {
+        const lat = parseFloat(DATA.lat), lng = parseFloat(DATA.lng);
+        map.panTo([lat, lng], { animate: true, duration: 0.5 });
+      }
+    }
+
+    // ── Dispatch & Messaging Drawer ──────────────────────────────────────────
+    let socket = null, threadMsgs = [], unread = 0;
+
+    function initMessaging() {
+      if (!SHORT_ID) return;
+      loadThread();
+
+      try {
+        socket = io();
+        socket.emit('track-delivery', SHORT_ID);
+        socket.on('sms:inbound', m => {
+          if (m.shortId !== SHORT_ID) return;
+          threadMsgs.push(m);
+          renderThread();
+          unread++;
+          updateBadge();
+          toast('📩 New dispatch message');
+        });
+        socket.on('sms:outbound', m => {
+          if (m.shortId !== SHORT_ID || threadMsgs.find(x => x.id === m.id)) return;
+          threadMsgs.push(m);
+          renderThread();
+        });
+      } catch (e) { console.warn('Socket offline'); }
+    }
+
+    async function loadThread() {
+      try {
+        const res = await fetch(`/api/sms/thread/${SHORT_ID}`);
+        const json = await res.json();
+        if (json.success) { threadMsgs = json.messages; renderThread(); }
+      } catch (e) {}
+    }
+
+    function renderThread() {
+      const el = document.getElementById('thread');
+      if (!threadMsgs.length) {
+        el.innerHTML = '<div class="msg-empty">No messages yet. Report an issue or message dispatch 👋</div>';
+        return;
+      }
+      el.innerHTML = threadMsgs.map(m =>
+        `<div class="msg-bubble ${m.direction === 'out' ? 'msg-out' : 'msg-in'}">${(m.body || '').replace(/</g, '&lt;')}</div>`
+      ).join('');
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function openSheet(prefill = '') {
+      document.getElementById('sheet-overlay').classList.add('open');
+      document.getElementById('msg-sheet').classList.add('open');
+      if (prefill) document.getElementById('msg-input').value = prefill;
+      unread = 0; updateBadge();
+    }
+    function closeSheet() {
+      document.getElementById('sheet-overlay').classList.remove('open');
+      document.getElementById('msg-sheet').classList.remove('open');
+    }
+    function updateBadge() {
+      document.getElementById('msg-badge').style.display = unread > 0 ? 'block' : 'none';
+    }
+
+    async function sendDispatchMsg(message) {
+      const local = { shortId: SHORT_ID, phone: DATA.execPhone || '', direction: 'out', body: message, createdAt: new Date() };
+      threadMsgs.push(local); renderThread();
+      try {
+        await fetch('/api/sms/send-dispatch', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shortId: SHORT_ID, execPhone: DATA.execPhone || '', message, driverName: DATA.execName || '' })
+        });
+        toast('✅ Sent to dispatch');
+      } catch (e) { toast('⚠️ Message queued'); }
+    }
+
+    function showArrived() {
+      show('arrived-screen');
+      document.getElementById('arr-flat').textContent = DATA.flat ? `Flat ${DATA.flat}` : 'Arrived';
+    }
+  </script>
+</body>
+</html>

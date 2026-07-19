@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config(); // Fast2SMS Integration Active
 
 const express    = require('express');
 const http       = require('http');

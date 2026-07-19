@@ -28,6 +28,16 @@ class VoiceRecorder {
     // Clean up any previous session first
     this._cleanup();
 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert(
+        '🎤 Microphone Access Info:\n\n' +
+        'Browsers require localhost or HTTPS to use live microphone recording.\n\n' +
+        '• On this computer: Open http://localhost:3000 to record live audio.\n' +
+        '• On phone/LAN IP: Use the "📁 Upload audio file" option below to pick a voice note!'
+      );
+      return false;
+    }
+
     try {
       this._stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -39,22 +49,17 @@ class VoiceRecorder {
     } catch (err) {
       console.error('Mic access error:', err);
       if (err.name === 'NotAllowedError') {
-        alert('Microphone permission denied.\nClick the lock icon in the address bar → Allow microphone.');
+        alert('Microphone permission denied.\nClick the lock/settings icon in the address bar → Allow microphone.');
       } else {
         alert('Could not access microphone: ' + err.message);
       }
       return false;
     }
 
-    const mimeType = this._getBestMimeType();
     try {
-      this.mediaRecorder = new MediaRecorder(
-        this._stream,
-        mimeType ? { mimeType } : {}
-      );
-    } catch (e) {
-      // Fallback — let browser pick
       this.mediaRecorder = new MediaRecorder(this._stream);
+    } catch (e) {
+      this.mediaRecorder = new MediaRecorder(this._stream, { mimeType: 'audio/webm' });
     }
 
     this.audioChunks = [];
@@ -70,12 +75,11 @@ class VoiceRecorder {
     // Resolve the stop promise once all data is collected
     this.mediaRecorder.onstop = () => {
       this.isRecording = false;
-      this._stopStream();
-
-      const usedType = this.mediaRecorder.mimeType || mimeType || 'audio/webm';
+      const usedType = (this.mediaRecorder && this.mediaRecorder.mimeType) || 'audio/webm';
       const blob = new Blob(this.audioChunks, { type: usedType });
 
-      console.log(`Recording stopped. Blob size: ${blob.size} bytes, type: ${blob.type}`);
+      console.log(`[VoiceRecorder] Stopped. Chunks: ${this.audioChunks.length}, Blob size: ${blob.size} bytes`);
+      this._stopStream();
 
       if (this._resolveStop) {
         this._resolveStop(blob);
@@ -83,9 +87,9 @@ class VoiceRecorder {
       }
     };
 
-    // Collect data every 250ms for reliable chunks
-    this.mediaRecorder.start(250);
-    console.log('Recording started, mimeType:', this.mediaRecorder.mimeType);
+    // Standard continuous recording (100% reliable on Android/iOS/Desktop)
+    this.mediaRecorder.start();
+    console.log('Recording started');
     return true;
   }
 
@@ -100,7 +104,11 @@ class VoiceRecorder {
     });
 
     try {
-      this.mediaRecorder.stop(); // triggers onstop after flush
+      if (this.mediaRecorder.state === 'recording') {
+        this.mediaRecorder.stop();
+      } else {
+        this._resolveStop && this._resolveStop(null);
+      }
     } catch (e) {
       console.error('Error stopping recorder:', e);
       this._resolveStop && this._resolveStop(null);

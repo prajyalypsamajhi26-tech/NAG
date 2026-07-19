@@ -300,6 +300,12 @@
             </button>
             <div id="recording-time" class="recording-time hidden">Recording... <span id="timer">0:00</span></div>
           </div>
+          <div style="margin-top:12px;text-align:center;">
+            <label for="voice-file-input" style="font-size:13px;font-weight:600;color:#64748b;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;padding:8px 16px;border-radius:20px;">
+              📁 Or Choose Voice Note Audio File
+            </label>
+            <input type="file" id="voice-file-input" accept="audio/*" class="hidden">
+          </div>
           <div id="voice-playback" class="voice-playback hidden">
             <audio id="voice-audio" controls></audio>
             <button id="re-record-btn" class="btn btn-secondary" aria-label="Re-record voice instruction">Re-record</button>
@@ -384,6 +390,23 @@
         <div id="tracking-map" class="map-container"></div>
 
         <div class="tracking-info">
+          <div class="info-card" style="grid-column: 1 / -1; background: #fff9e6; border: 1.5px solid #FFB800; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <h3 style="margin:0;color:#1a1a2e;font-size:16px;">🛵 Delivery Executive PWA Link</h3>
+              <span style="font-size:11px;font-weight:700;background:#1a1a2e;color:#FFB800;padding:3px 8px;border-radius:12px;">Turn-by-Turn Navigation</span>
+            </div>
+            <p style="font-size:13px;color:#555;margin-bottom:12px;">Open or share this link with your delivery partner for step-by-step door directions & voice notes:</p>
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <input id="tracking-pwa-link" readonly style="flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:10px;font-size:13px;background:#fff;" value="Loading link...">
+              <button id="copy-tracking-link-btn" class="btn btn-secondary" style="padding:8px 14px;font-size:13px;">Copy</button>
+              <a id="open-exec-view-btn" href="#" target="_blank" class="btn btn-primary" style="padding:8px 14px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;">Open View 🚀</a>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button id="tracking-sms-btn" class="btn btn-secondary" style="flex:1;font-size:13px;">📱 Send via SMS</button>
+              <button id="tracking-whatsapp-btn" class="btn" style="flex:1;background:#25D366;color:#fff;border-radius:12px;font-weight:700;font-size:13px;border:none;">💬 Send via WhatsApp</button>
+            </div>
+          </div>
+
           <div class="info-card">
             <h3>Delivery Partner</h3>
             <p>Contact: <span id="delivery-phone" style="font-weight: 600;">--</span></p>
