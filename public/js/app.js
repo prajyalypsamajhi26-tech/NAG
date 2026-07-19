@@ -927,11 +927,81 @@ class DoorPilotApp {
 
   // ==================== TRACKING ====================
   startTracking() {
-    document.getElementById('delivery-phone').textContent = this.currentDeliveryExecutivePhone || 'Contacting...';
+    const phoneEl = document.getElementById('delivery-phone');
+    if (phoneEl) {
+      phoneEl.textContent = this.currentDeliveryExecutivePhone || this.orderData.customerPhone || 'Contacting...';
+    }
+
+    this.setupExecutivePwaLink();
 
     // Initialize real map for delivery executive location updates
     this.initializeRealTracking();
   }
+
+  setupExecutivePwaLink() {
+    const d = this.orderData.deliveryDetails || {};
+    const payload = {
+      name: this.orderData.customerName || d.customerName || 'Customer',
+      phone: this.orderData.customerPhone || d.customerPhone || '',
+      lat: (this.orderData.mapPin && this.orderData.mapPin.latitude) || 13.2916,
+      lng: (this.orderData.mapPin && this.orderData.mapPin.longitude) || 77.6768,
+      colony: d.colonyName || 'Mudugurki, Devanahalli',
+      gate: d.gateNumber || '1',
+      apt: d.apartmentName || 'Nagarjuna Campus',
+      floor: d.floorNumber || '2',
+      lift: d.hasLift !== undefined ? d.hasLift : true,
+      flat: d.flatNumber || '204',
+      color: d.flatColor || 'Blue Door',
+      intercom: d.intercomCode || '204#',
+      landmarks: d.specialIdentifiers || this.orderData.textInstruction || 'Near main block entrance',
+      voice: this.orderData.voiceNoteUrl || '',
+      img: this.orderData.landmarkImageUrl || '',
+      exp: Date.now() + 24 * 3600 * 1000 // 24h expiration
+    };
+
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    const execUrl = `${window.location.origin}/exec.html#${b64}`;
+
+    const linkInput = document.getElementById('tracking-pwa-link');
+    const openBtn   = document.getElementById('open-exec-view-btn');
+    const copyBtn   = document.getElementById('copy-tracking-link-btn');
+    const smsBtn    = document.getElementById('tracking-sms-btn');
+    const waBtn     = document.getElementById('tracking-whatsapp-btn');
+
+    if (linkInput) linkInput.value = execUrl;
+    if (openBtn) openBtn.href = execUrl;
+
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(execUrl);
+          this.showNotification('📋 Executive link copied to clipboard!');
+        } catch (e) {
+          if (linkInput) {
+            linkInput.select();
+            document.execCommand('copy');
+            this.showNotification('📋 Executive link copied!');
+          }
+        }
+      };
+    }
+
+    if (smsBtn) {
+      smsBtn.onclick = () => {
+        const phone = payload.phone || '';
+        const body = encodeURIComponent(`Hi! Here is your DoorPilot turn-by-turn door navigation link:\n${execUrl}`);
+        window.open(`sms:${phone}?body=${body}`);
+      };
+    }
+
+    if (waBtn) {
+      waBtn.onclick = () => {
+        const text = encodeURIComponent(`🛵 *DoorPilot Executive Delivery Link*\n\nHi! Use this link for step-by-step door navigation and voice guidance:\n${execUrl}`);
+        window.open(`https://wa.me/?text=${text}`);
+      };
+    }
+  }
+
 
   initializeRealTracking() {
     setTimeout(() => {
