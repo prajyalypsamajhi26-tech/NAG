@@ -488,23 +488,29 @@
 
     // ── Load Delivery Data from Server ──────────────────────────────────────
     async function loadData() {
-      const parts = location.pathname.split('/').filter(Boolean);
-      let rawId = parts[parts.length - 1] || '';
-      // Strip any accidental trailing punctuation like '!' or '.' from URL
-      const shortId = rawId.replace(/[^a-zA-Z0-9]/g, '');
-      SHORT_ID = shortId;
-
-      if (!shortId || shortId === 'exec.html') {
+      // 1. First check if a base64 payload exists in hash (#...)
+      const h = location.hash.slice(1);
+      if (h) {
         try {
-          const h = location.hash.slice(1);
-          if (!h) throw new Error('no id');
           DATA = JSON.parse(decodeURIComponent(escape(atob(h))));
           startApp();
+          return;
         } catch (e) {
-          showExpired('Invalid Delivery Link', 'No valid delivery payload found in link.');
+          console.warn('Hash payload parsing failed:', e);
         }
+      }
+
+      // 2. Otherwise parse shortId from URL path (e.g. /exec/WURUD8DY)
+      const parts = location.pathname.split('/').filter(Boolean);
+      let rawId = parts[parts.length - 1] || '';
+      
+      if (!rawId || rawId.endsWith('.html')) {
+        showExpired('Delivery Link Required', 'Please use a valid delivery navigation link from customer SMS or app.');
         return;
       }
+
+      const shortId = rawId.replace(/[^a-zA-Z0-9]/g, '');
+      SHORT_ID = shortId;
 
       try {
         const res = await fetch(`/api/exec-links/${shortId}`);
@@ -518,6 +524,7 @@
         showExpired('Connection Error', 'Could not fetch delivery details. Please check connection.');
       }
     }
+
 
     function showExpired(title, sub) {
       show('expired-screen');
