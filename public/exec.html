@@ -492,13 +492,22 @@
       const h = location.hash.slice(1);
       if (h) {
         try {
-          DATA = JSON.parse(decodeURIComponent(escape(atob(h))));
+          try {
+            DATA = JSON.parse(decodeURIComponent(escape(atob(h))));
+          } catch (e1) {
+            try {
+              DATA = JSON.parse(atob(h));
+            } catch (e2) {
+              DATA = JSON.parse(decodeURIComponent(atob(h)));
+            }
+          }
           startApp();
           return;
         } catch (e) {
           console.warn('Hash payload parsing failed:', e);
         }
       }
+
 
       // 2. Otherwise parse shortId from URL path (e.g. /exec/WURUD8DY)
       const parts = location.pathname.split('/').filter(Boolean);
@@ -533,16 +542,20 @@
     }
 
     function startApp() {
-      if (DATA.exp && Date.now() > DATA.exp) {
-        showExpired('Link Expired', 'Ask the customer to generate a new one.');
-      } else {
-        // Direct launch to turn-by-turn navigation (bypassing mandatory initial OTP)
-        show('nav-screen');
-        initNav();
+      try {
+        if (DATA.exp && Date.now() > DATA.exp) {
+          showExpired('Link Expired', 'Ask the customer to generate a new one.');
+        } else {
+          // Direct launch to turn-by-turn navigation
+          show('nav-screen');
+          initNav();
+        }
+      } catch (err) {
+        console.error('App launch error:', err);
+        showExpired('Navigation Error', 'Could not load delivery guide: ' + err.message);
       }
     }
 
-    loadData();
 
     // ── Turn-by-Turn Navigation Logic ────────────────────────────────────────
     let steps = [], cur = 0, map = null, custMarker = null, myMarker = null, myLine = null;
@@ -853,6 +866,13 @@
     function showArrived() {
       show('arrived-screen');
       document.getElementById('arr-flat').textContent = DATA.flat ? `Flat ${DATA.flat}` : 'Arrived';
+    }
+
+    // Start app after DOM and all script definitions are ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadData);
+    } else {
+      loadData();
     }
   </script>
 </body>
