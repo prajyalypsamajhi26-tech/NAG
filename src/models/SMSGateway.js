@@ -1,5 +1,5 @@
 // ==================== SMS Gateway ====================
-// Supports: Twilio (real), or simulated (console log)
+// Supports: Fast2SMS (India), Twilio, TextBelt, or simulated
 
 class SMSGateway {
   constructor() {
@@ -11,13 +11,9 @@ class SMSGateway {
     console.log(`[SMS] (${provider}) → ${phoneNumber}: ${message}`);
 
     try {
-      if (provider === 'fast2sms') {
-        return await this._sendViaFast2SMS(phoneNumber, message);
-      } else if (provider === 'twilio') {
-        return await this._sendViaTwilio(phoneNumber, message);
-      } else if (provider === 'textbelt') {
-        return await this._sendViaTextBelt(phoneNumber, message);
-      }
+      if (provider === 'fast2sms') return await this._sendViaFast2SMS(phoneNumber, message);
+      if (provider === 'twilio')   return await this._sendViaTwilio(phoneNumber, message);
+      if (provider === 'textbelt') return await this._sendViaTextBelt(phoneNumber, message);
       return await this._simulate(phoneNumber, message);
     } catch (err) {
       console.error('[SMS] Send failed:', err.message);
@@ -25,15 +21,14 @@ class SMSGateway {
     }
   }
 
-
   async _sendViaFast2SMS(phoneNumber, message) {
     const apiKey = process.env.FAST2SMS_API_KEY;
-    if (!apiKey) {
-      console.warn('[SMS] FAST2SMS_API_KEY missing — falling back to simulation');
+    if (!apiKey || apiKey === 'your_fast2sms_api_key_here') {
+      console.warn('[Fast2SMS] API key missing — falling back to simulation');
       return this._simulate(phoneNumber, message);
     }
 
-    const cleanedPhone = phoneNumber.replace(/[^0-9]/g, '').slice(-10);
+    const cleanedPhone = String(phoneNumber).replace(/^\+91/, '').replace(/\D/g, '').slice(-10);
     if (!cleanedPhone || cleanedPhone.length !== 10) {
       console.error(`[Fast2SMS] Invalid phone number provided: ${phoneNumber}`);
       return { success: false, provider: 'fast2sms', error: 'Invalid 10-digit mobile number' };
@@ -70,7 +65,6 @@ class SMSGateway {
       return { success: false, provider: 'fast2sms', error: err.message };
     }
   }
-
 
   async _sendViaTextBelt(phoneNumber, message) {
     console.log(`[SMS] Sending real SMS via TextBelt to ${phoneNumber}...`);
@@ -141,7 +135,6 @@ class SMSGateway {
 
     try {
       const client = twilio(sid, token);
-      // Create simple TwiML for text-to-speech
       const twiml = new twilio.twiml.VoiceResponse();
       twiml.say({ voice: 'alice' }, message);
 

@@ -301,10 +301,140 @@
       border: 1px solid rgba(255,255,255,0.1); animation: toastUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes toastUp { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+=======
+  <title>DoorPilot — Delivery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Inter',Arial,sans-serif;background:#f0f0f0;overflow:hidden}
+
+    /* ── screens ── */
+    .screen{display:none;height:100vh;flex-direction:column}
+    .screen.active{display:flex}
+
+    /* ── OTP ── */
+    #otp-screen{background:#1a1a2e;align-items:center;justify-content:center;padding:32px 24px;gap:0}
+    .otp-brand{font-family:'Fredoka One',cursive;font-size:44px;font-weight:400;color:#FFB800;margin-bottom:32px}
+    .otp-title{font-size:28px;font-weight:900;color:#fff;margin-bottom:8px;text-align:center}
+    .otp-sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:36px;text-align:center}
+    .otp-row{display:flex;gap:12px;margin-bottom:28px}
+    .otp-box{width:64px;height:76px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);
+      border-radius:14px;color:#fff;font-size:34px;font-weight:900;text-align:center;
+      outline:none;caret-color:#FFB800;transition:border-color .15s}
+    .otp-box:focus{border-color:#FFB800;background:rgba(255,184,0,.12)}
+    .otp-verify-btn{width:100%;max-width:280px;padding:17px;background:#FFB800;color:#1a1a2e;
+      border:none;border-radius:50px;font-size:17px;font-weight:900;cursor:pointer}
+    .otp-err{color:#ef4444;font-size:14px;font-weight:700;margin-top:14px;min-height:20px}
+
+    /* ── NAV SCREEN ── */
+    #nav-screen{background:#fff}
+
+    /* exec header bar */
+    .exec-header{
+      background:#FFB800;padding:14px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-shrink:0;z-index:10;
+    }
+    .exec-brand{font-family:'Fredoka One',cursive;font-size:26px;color:#1a1a2e}
+    .step-badge{
+      background:#1a1a2e;color:#FFB800;
+      font-size:12px;font-weight:700;
+      padding:5px 14px;border-radius:50px;
+      letter-spacing:.3px;
+    }
+
+    /* map wrap — 45vh */
+    .map-wrap{position:relative;flex-shrink:0;height:45vh}
+    #exec-map{width:100%;height:100%;z-index:1;background:#e8e8e8}
+
+    /* voice sticky — bottom of map */
+    .voice-sticky{
+      position:absolute;bottom:0;left:0;right:0;
+      background:rgba(26,26,46,.92);
+      padding:10px 16px;display:flex;align-items:center;gap:12px;
+      z-index:500;backdrop-filter:blur(8px);
+    }
+    .voice-label{flex:1;font-size:13px;font-weight:700;color:rgba(255,255,255,.8)}
+    .voice-play{width:40px;height:40px;border-radius:50%;background:#FFB800;border:none;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .voice-play svg{width:18px;height:18px;fill:#1a1a2e}
+
+    /* bottom panel */
+    .bottom-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+    /* step card */
+    .step-card{flex:1;padding:14px 16px 8px;overflow-y:auto}
+    .step-header{margin-bottom:10px}
+    .step-num{font-size:11px;font-weight:700;color:#FFB800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+    .step-name{font-size:22px;font-weight:900;color:#1a1a2e;letter-spacing:-.3px;line-height:1.15}
+    .step-instr{font-size:14px;line-height:1.65;color:#333;background:#fffbee;
+      border-left:4px solid #FFB800;border-radius:0 10px 10px 0;
+      padding:11px 14px;margin-bottom:10px}
+    .step-photo{width:100%;border-radius:12px;max-height:140px;object-fit:cover;margin-bottom:6px}
+
+    /* progress dots */
+    .dots{display:flex;justify-content:center;gap:6px;padding:6px 0}
+    .dot{width:7px;height:7px;border-radius:50%;background:#ddd;transition:all .2s}
+    .dot.on{background:#FFB800;transform:scale(1.4)}
+    .dot.done{background:#22c55e}
+
+    /* prev/next */
+    .nav-row{display:flex;gap:10px;padding:8px 14px}
+    .nav-btn{flex:1;padding:14px;border-radius:12px;font-size:15px;font-weight:800;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+      transition:all .15s;border:none}
+    .nav-prev{background:#f0f0f0;color:#555}
+    .nav-prev:disabled{opacity:.35;cursor:not-allowed}
+    .nav-next{background:#1a1a2e;color:#FFB800;box-shadow:0 4px 14px rgba(26,26,46,.25)}
+    .nav-next:hover{background:#2d2d4a}
+
+    /* action buttons */
+    .act-row{display:flex;gap:8px;padding:0 14px 14px}
+    .act{flex:1;padding:14px 6px;border:none;border-radius:12px;
+      font-size:12px;font-weight:900;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+      transition:all .15s;min-height:60px}
+    .act:active{transform:scale(.96)}
+    .act svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+    .act-near{background:#FFB800;color:#1a1a2e}
+    .act-done{background:#1a1a2e;color:#FFB800}
+    .act-wrong{background:#ef4444;color:#fff}
+
+    /* arrived */
+    #arrived-screen{background:#FFB800;align-items:center;justify-content:center;text-align:center;padding:40px 24px}
+    .arr-ring{width:100px;height:100px;border-radius:50%;background:#1a1a2e;
+      display:flex;align-items:center;justify-content:center;margin-bottom:24px;
+      box-shadow:0 8px 32px rgba(26,26,46,.35);
+      animation:pop .6s cubic-bezier(.34,1.4,.64,1) both}
+    @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .arr-ring svg{width:48px;height:48px;stroke:#FFB800;fill:none;stroke-width:2.5}
+    .arr-title{font-size:30px;font-weight:900;color:#1a1a2e;margin-bottom:8px}
+    .arr-flat{font-family:'Fredoka One',cursive;font-size:54px;font-weight:400;color:#1a1a2e;line-height:1;margin:12px 0}
+    .arr-sub{font-size:14px;color:rgba(26,26,46,.6);margin-bottom:32px}
+    .bell-btn{padding:16px 44px;background:#1a1a2e;color:#FFB800;
+      border:none;border-radius:50px;font-size:17px;font-weight:900;
+      cursor:pointer;display:flex;align-items:center;gap:12px}
+
+    /* expired */
+    #expired-screen{background:#fff;align-items:center;justify-content:center;text-align:center;padding:40px}
+    .exp-icon{font-size:52px;margin-bottom:16px}
+    .exp-title{font-size:22px;font-weight:900;color:#ef4444;margin-bottom:8px}
+    .exp-sub{font-size:14px;color:#888}
+
+    /* toast */
+    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
+      background:rgba(20,20,20,.9);color:#fff;padding:11px 22px;
+      border-radius:50px;font-size:14px;font-weight:700;z-index:9999;
+      white-space:nowrap;animation:tUp .2s ease}
+    @keyframes tUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+>>>>>>> 3080315ea0c6a9dd5c9f21f83b4a0a8e77d00062
   </style>
 </head>
 <body>
 
+<<<<<<< HEAD
   <!-- Nav Screen -->
   <div id="nav-screen" class="screen active">
 
@@ -875,5 +1005,4 @@
       loadData();
     }
   </script>
-</body>
 </html>

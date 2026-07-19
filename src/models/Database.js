@@ -85,5 +85,6 @@ module.exports = {
   ordersDb: new Database('orders'),
   deliveryExecutivesDb: new Database('delivery_executives'),
   trackingDb: new Database('tracking_logs'),
-  ratingsDb: new Database('ratings')
+  ratingsDb: new Database('ratings'),
+  execLinksDb: new Database('exec_links')
 };
