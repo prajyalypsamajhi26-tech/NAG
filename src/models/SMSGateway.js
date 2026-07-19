@@ -7,23 +7,24 @@ class SMSGateway {
   }
 
   async sendSMS(phoneNumber, message) {
-    console.log(`[SMS] → ${phoneNumber}: ${message}`);
+    const provider = (process.env.SMS_PROVIDER || this.provider || 'simulated').toLowerCase();
+    console.log(`[SMS] (${provider}) → ${phoneNumber}: ${message}`);
 
     try {
-      if (this.provider === 'fast2sms') {
+      if (provider === 'fast2sms') {
         return await this._sendViaFast2SMS(phoneNumber, message);
-      } else if (this.provider === 'twilio') {
+      } else if (provider === 'twilio') {
         return await this._sendViaTwilio(phoneNumber, message);
-      } else if (this.provider === 'textbelt') {
+      } else if (provider === 'textbelt') {
         return await this._sendViaTextBelt(phoneNumber, message);
       }
       return await this._simulate(phoneNumber, message);
     } catch (err) {
       console.error('[SMS] Send failed:', err.message);
-      // Always fall back to simulation so the app doesn't break
       return await this._simulate(phoneNumber, message);
     }
   }
+
 
   async _sendViaFast2SMS(phoneNumber, message) {
     const apiKey = process.env.FAST2SMS_API_KEY;
@@ -33,6 +34,11 @@ class SMSGateway {
     }
 
     const cleanedPhone = phoneNumber.replace(/[^0-9]/g, '').slice(-10);
+    if (!cleanedPhone || cleanedPhone.length !== 10) {
+      console.error(`[Fast2SMS] Invalid phone number provided: ${phoneNumber}`);
+      return { success: false, provider: 'fast2sms', error: 'Invalid 10-digit mobile number' };
+    }
+
     console.log(`[Fast2SMS] Sending real SMS to ${cleanedPhone}...`);
 
     try {
@@ -57,11 +63,11 @@ class SMSGateway {
         return { success: true, provider: 'fast2sms', data };
       } else {
         console.error(`[Fast2SMS] Error response:`, data);
-        return this._simulate(phoneNumber, message);
+        return { success: false, provider: 'fast2sms', error: data.message || 'Fast2SMS returned error', data };
       }
     } catch (err) {
       console.error('[Fast2SMS] Request failed:', err.message);
-      return this._simulate(phoneNumber, message);
+      return { success: false, provider: 'fast2sms', error: err.message };
     }
   }
 
