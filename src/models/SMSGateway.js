@@ -10,7 +10,9 @@ class SMSGateway {
     console.log(`[SMS] → ${phoneNumber}: ${message}`);
 
     try {
-      if (this.provider === 'twilio') {
+      if (this.provider === 'fast2sms') {
+        return await this._sendViaFast2SMS(phoneNumber, message);
+      } else if (this.provider === 'twilio') {
         return await this._sendViaTwilio(phoneNumber, message);
       } else if (this.provider === 'textbelt') {
         return await this._sendViaTextBelt(phoneNumber, message);
@@ -22,6 +24,47 @@ class SMSGateway {
       return await this._simulate(phoneNumber, message);
     }
   }
+
+  async _sendViaFast2SMS(phoneNumber, message) {
+    const apiKey = process.env.FAST2SMS_API_KEY;
+    if (!apiKey) {
+      console.warn('[SMS] FAST2SMS_API_KEY missing — falling back to simulation');
+      return this._simulate(phoneNumber, message);
+    }
+
+    const cleanedPhone = phoneNumber.replace(/[^0-9]/g, '').slice(-10);
+    console.log(`[Fast2SMS] Sending real SMS to ${cleanedPhone}...`);
+
+    try {
+      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        method: 'POST',
+        headers: {
+          'authorization': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          route: 'q',
+          message: message,
+          language: 'english',
+          flash: 0,
+          numbers: cleanedPhone
+        })
+      });
+
+      const data = await response.json();
+      if (data && (data.return === true || data.status_code === 200)) {
+        console.log(`[Fast2SMS] Success! Message sent:`, data.message || data.request_id);
+        return { success: true, provider: 'fast2sms', data };
+      } else {
+        console.error(`[Fast2SMS] Error response:`, data);
+        return this._simulate(phoneNumber, message);
+      }
+    } catch (err) {
+      console.error('[Fast2SMS] Request failed:', err.message);
+      return this._simulate(phoneNumber, message);
+    }
+  }
+
 
   async _sendViaTextBelt(phoneNumber, message) {
     console.log(`[SMS] Sending real SMS via TextBelt to ${phoneNumber}...`);

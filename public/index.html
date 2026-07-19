@@ -390,22 +390,35 @@
         <div id="tracking-map" class="map-container"></div>
 
         <div class="tracking-info">
-          <div class="info-card" style="grid-column: 1 / -1; background: #fff9e6; border: 1.5px solid #FFB800; border-radius: 16px; padding: 16px; margin-bottom: 12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-              <h3 style="margin:0;color:#1a1a2e;font-size:16px;">🛵 Delivery Executive PWA Link</h3>
-              <span style="font-size:11px;font-weight:700;background:#1a1a2e;color:#FFB800;padding:3px 8px;border-radius:12px;">Turn-by-Turn Navigation</span>
+          <div class="info-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #fffbee 0%, #fff6d6 100%); border: 2px solid #FFB800; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(255, 184, 0, 0.18);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <h3 style="margin:0;color:#1a1a2e;font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px;">
+                🛵 Delivery Executive PWA Link
+              </h3>
+              <span style="font-size:12px;font-weight:800;background:#1a1a2e;color:#FFB800;padding:4px 12px;border-radius:20px;letter-spacing:0.3px;">Turn-by-Turn Navigation</span>
             </div>
-            <p style="font-size:13px;color:#555;margin-bottom:12px;">Open or share this link with your delivery partner for step-by-step door directions & voice notes:</p>
-            <div style="display:flex;gap:8px;margin-bottom:10px;">
-              <input id="tracking-pwa-link" readonly style="flex:1;padding:10px 12px;border:1px solid #ccc;border-radius:10px;font-size:13px;background:#fff;" value="Loading link...">
-              <button id="copy-tracking-link-btn" class="btn btn-secondary" style="padding:8px 14px;font-size:13px;">Copy</button>
-              <a id="open-exec-view-btn" href="#" target="_blank" class="btn btn-primary" style="padding:8px 14px;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;">Open View 🚀</a>
+            <p style="font-size:14px;color:#475569;margin-bottom:14px;font-weight:500;">Open or share this link with your delivery partner for step-by-step door directions & voice notes:</p>
+            
+            <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+              <input id="tracking-pwa-link" readonly style="flex:1;min-width:240px;padding:14px 16px;border:2px solid #FFB800;border-radius:14px;font-size:14px;font-weight:600;background:#ffffff;color:#1e293b;outline:none;" value="Loading link..." onclick="this.select()">
+              <button id="copy-tracking-link-btn" class="btn" style="padding:14px 24px;font-size:15px;font-weight:800;background:#1a1a2e;color:#FFB800;border:none;border-radius:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(26,26,46,0.25);transition:all 0.2s;">
+                📋 Copy Link
+              </button>
+              <a id="open-exec-view-btn" href="#" target="_blank" class="btn btn-primary" style="padding:14px 24px;font-size:15px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:8px;border-radius:14px;background:linear-gradient(135deg, #FFD440, #FFB800);color:#12121f;box-shadow:0 4px 14px rgba(255,184,0,0.35);">
+                Open View 🚀
+              </a>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button id="tracking-sms-btn" class="btn btn-secondary" style="flex:1;font-size:13px;">📱 Send via SMS</button>
-              <button id="tracking-whatsapp-btn" class="btn" style="flex:1;background:#25D366;color:#fff;border-radius:12px;font-weight:700;font-size:13px;border:none;">💬 Send via WhatsApp</button>
+
+            <div style="display:flex;gap:10px;">
+              <button id="tracking-sms-btn" class="btn" style="flex:1;padding:12px 16px;font-size:14px;font-weight:800;background:#ffffff;color:#1e293b;border:1.5px solid #cbd5e1;border-radius:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;">
+                📱 Send via SMS
+              </button>
+              <button id="tracking-whatsapp-btn" class="btn" style="flex:1;padding:12px 16px;font-size:14px;font-weight:800;background:#25D366;color:#ffffff;border:none;border-radius:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(37,211,102,0.3);">
+                💬 Send via WhatsApp
+              </button>
             </div>
           </div>
+
 
           <div class="info-card">
             <h3>Delivery Partner</h3>
