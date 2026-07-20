@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tee-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff"/>
+      <stop offset="100%" stop-color="#fae8ff"/>
+    </linearGradient>
+    <filter id="tee-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#c084fc" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#tee-bg)"/>
+
+  <g filter="url(#tee-shadow)" transform="translate(120, 50)">
+    <!-- Silicone Ring -->
+    <circle cx="80" cy="80" r="60" fill="none" stroke="#a855f7" stroke-width="24"/>
+    <circle cx="80" cy="80" r="60" fill="none" stroke="#ec4899" stroke-width="12"/>
+
+    <!-- Textured Bumps -->
+    <circle cx="80" cy="20" r="10" fill="#facc15"/>
+    <circle cx="140" cy="80" r="10" fill="#3b82f6"/>
+    <circle cx="80" cy="140" r="10" fill="#22c55e"/>
+    <circle cx="20" cy="80" r="10" fill="#ef4444"/>
+
+    <text x="80" y="175" font-family="Arial, sans-serif" font-weight="bold" font-size="12" fill="#7e22ce" text-anchor="middle">SILICONE BABY TEETHER</text>
+  </g>
+</svg>

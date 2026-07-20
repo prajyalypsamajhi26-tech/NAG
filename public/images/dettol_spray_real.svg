@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="det-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </radialGradient>
+    <filter id="shadow-3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="12" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#det-bg)"/>
+  <ellipse cx="200" cy="245" rx="55" ry="12" fill="#0f172a" opacity="0.15"/>
+
+  <g filter="url(#shadow-3d)" transform="translate(150, 20)">
+    <!-- Trigger Spray Head -->
+    <path d="M 35 15 L 75 15 L 75 35 L 60 45 L 35 45 Z" fill="#15803d"/>
+    <path d="M 60 25 L 85 25 L 80 40 L 60 35 Z" fill="#ffffff"/>
+    <rect x="42" y="45" width="16" height="20" fill="#166534"/>
+
+    <!-- Bottle Body -->
+    <rect x="20" y="65" width="60" height="140" rx="15" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+
+    <rect x="25" y="85" width="50" height="95" rx="8" fill="#f0fdf4"/>
+    
+    <!-- Dettol Sword Shield Logo -->
+    <circle cx="50" cy="110" r="14" fill="#15803d"/>
+    <path d="M 50 98 L 50 122 M 38 110 L 62 110" stroke="#ffffff" stroke-width="3"/>
+
+    <text x="50" y="138" font-family="'Impact', sans-serif" font-weight="900" font-size="14" fill="#166534" text-anchor="middle">DETTOL</text>
+    <text x="50" y="152" font-family="Arial, sans-serif" font-weight="800" font-size="8" fill="#15803d" text-anchor="middle">DISINFECTANT</text>
+    <text x="50" y="166" font-family="Arial, sans-serif" font-weight="800" font-size="8" fill="#166534" text-anchor="middle">500 ml</text>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sip-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <filter id="sip-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#16a34a" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#sip-bg)"/>
+
+  <g filter="url(#sip-shadow)" transform="translate(130, 40)">
+    <!-- Spout -->
+    <path d="M 60 15 L 80 15 L 75 35 L 65 35 Z" fill="#facc15"/>
+    <rect x="35" y="35" width="70" height="15" rx="4" fill="#22c55e"/>
+
+    <!-- Handles -->
+    <path d="M 35 55 C 5 55, 5 130, 35 130" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 105 55 C 135 55, 135 130, 105 130" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+    <!-- Cup Body -->
+    <rect x="30" y="50" width="80" height="130" rx="15" fill="#ffffff" stroke="#4ade80" stroke-width="2"/>
+    <!-- Liquid -->
+    <rect x="34" y="90" width="72" height="86" rx="10" fill="#facc15" opacity="0.6"/>
+
+    <text x="70" y="150" font-family="Arial, sans-serif" font-weight="bold" font-size="11" fill="#15803d" text-anchor="middle">SIPPER CUP</text>
+  </g>
+</svg>

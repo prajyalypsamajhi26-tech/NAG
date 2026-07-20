@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="col-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </radialGradient>
+    <linearGradient id="col-bot" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <filter id="shadow-3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="12" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#col-bg)"/>
+  <ellipse cx="200" cy="245" rx="55" ry="12" fill="#0f172a" opacity="0.15"/>
+
+  <g filter="url(#shadow-3d)" transform="translate(150, 20)">
+    <!-- Trigger Spray Head -->
+    <path d="M 35 15 L 75 15 L 75 35 L 60 45 L 35 45 Z" fill="#22c55e"/>
+    <path d="M 60 25 L 85 25 L 80 40 L 60 35 Z" fill="#ffffff"/>
+    <rect x="42" y="45" width="16" height="20" fill="#0284c7"/>
+
+    <!-- Clear Bottle Body -->
+    <rect x="20" y="65" width="60" height="140" rx="15" fill="url(#col-bot)"/>
+
+    <rect x="25" y="85" width="50" height="95" rx="8" fill="#ffffff"/>
+    <text x="50" y="112" font-family="'Impact', sans-serif" font-weight="900" font-size="20" fill="#0284c7" text-anchor="middle">COLIN</text>
+    <text x="50" y="130" font-family="Arial, sans-serif" font-weight="900" font-size="9" fill="#22c55e" text-anchor="middle">GLASS CLEANER</text>
+
+    <!-- Spray Shine -->
+    <path d="M 38 145 L 42 145 M 50 142 L 50 148 M 58 145 L 62 145" stroke="#38bdf8" stroke-width="2.5"/>
+
+    <text x="50" y="166" font-family="Arial, sans-serif" font-weight="800" font-size="9" fill="#0369a1" text-anchor="middle">500 ml</text>
+  </g>
+</svg>

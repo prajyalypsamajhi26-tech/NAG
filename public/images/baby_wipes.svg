@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wip-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="wip-pkg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <filter id="wip-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#1e3a8a" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#wip-bg)"/>
+
+  <g filter="url(#wip-shadow)" transform="translate(100, 60)">
+    <!-- Wipes Packet -->
+    <rect x="0" y="0" width="200" height="140" rx="20" fill="url(#wip-pkg)"/>
+
+    <!-- Plastic Flip Lid (Center) -->
+    <rect x="60" y="30" width="80" height="50" rx="12" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+    <ellipse cx="100" cy="55" rx="25" ry="10" fill="#bfdbfe"/>
+    <rect x="85" y="65" width="30" height="6" rx="3" fill="#3b82f6"/>
+
+    <!-- Soft Wet Wipe pulled out -->
+    <path d="M 80 30 Q 100 0 120 30 Z" fill="#ffffff" opacity="0.95"/>
+
+    <text x="100" y="105" font-family="'Arial Black', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">BABY WIPES</text>
+    <text x="100" y="122" font-family="Arial, sans-serif" font-weight="bold" font-size="11" fill="#93c5fd" text-anchor="middle">72 Wipes • Gentle &amp; Pure</text>
+  </g>
+</svg>

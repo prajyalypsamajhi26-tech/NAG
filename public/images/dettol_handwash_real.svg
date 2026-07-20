@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="dhw-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </radialGradient>
+    <filter id="shadow-3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="12" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#dhw-bg)"/>
+  <ellipse cx="200" cy="245" rx="55" ry="12" fill="#0f172a" opacity="0.15"/>
+
+  <g filter="url(#shadow-3d)" transform="translate(150, 30)">
+    <!-- Pump Nozzle -->
+    <rect x="35" y="10" width="30" height="15" fill="#15803d" rx="4"/>
+    <rect x="45" y="25" width="10" height="15" fill="#cbd5e1"/>
+
+    <!-- Clear Pump Bottle Body -->
+    <rect x="15" y="40" width="70" height="165" rx="20" fill="#ffffff" stroke="#166534" stroke-width="2"/>
+
+    <rect x="22" y="65" width="56" height="115" rx="10" fill="#f0fdf4"/>
+    <!-- Dettol Shield -->
+    <circle cx="50" cy="95" r="14" fill="#15803d"/>
+    <path d="M 50 83 L 50 107 M 38 95 L 62 95" stroke="#ffffff" stroke-width="3"/>
+
+    <text x="50" y="125" font-family="'Impact', sans-serif" font-weight="900" font-size="12" fill="#166534" text-anchor="middle">DETTOL</text>
+    <text x="50" y="140" font-family="Arial, sans-serif" font-weight="800" font-size="9" fill="#15803d" text-anchor="middle">LIQUID HANDWASH</text>
+    <text x="50" y="164" font-family="Arial, sans-serif" font-weight="800" font-size="9" fill="#166534" text-anchor="middle">200 ml</text>
+  </g>
+</svg>

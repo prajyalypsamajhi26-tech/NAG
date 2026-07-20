@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="lot-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf2f8"/>
+      <stop offset="100%" stop-color="#fbcfe8"/>
+    </linearGradient>
+    <linearGradient id="lot-bot" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="lot-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#db2777" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#lot-bg)"/>
+
+  <g filter="url(#lot-shadow)" transform="translate(150, 35)">
+    <!-- Pump Nozzle -->
+    <rect x="35" y="10" width="30" height="15" fill="#db2777" rx="3"/>
+    <rect x="45" y="25" width="10" height="15" fill="#cbd5e1"/>
+
+    <!-- Bottle Body -->
+    <rect x="15" y="40" width="70" height="160" rx="25" fill="url(#lot-bot)" stroke="#f472b6" stroke-width="2"/>
+
+    <!-- Label -->
+    <rect x="22" y="65" width="56" height="110" rx="10" fill="#fdf2f8"/>
+    
+    <!-- Teddy bear icon -->
+    <circle cx="50" cy="95" r="12" fill="#f472b6"/>
+    <circle cx="42" cy="85" r="5" fill="#f472b6"/>
+    <circle cx="58" cy="85" r="5" fill="#f472b6"/>
+
+    <text x="50" y="122" font-family="'Arial Black', sans-serif" font-weight="900" font-size="10" fill="#db2777" text-anchor="middle">HIMALAYA</text>
+    <text x="50" y="136" font-family="Arial, sans-serif" font-weight="bold" font-size="9" fill="#ec4899" text-anchor="middle">BABY LOTION</text>
+    <text x="50" y="160" font-family="Arial, sans-serif" font-weight="bold" font-size="8" fill="#9d174d" text-anchor="middle">200 ml</text>
+  </g>
+</svg>

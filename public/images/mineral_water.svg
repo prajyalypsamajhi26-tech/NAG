@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mw-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="mw-bottle" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="mw-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#0284c7" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#mw-bg)"/>
+
+  <g filter="url(#mw-shadow)" transform="translate(145, 25)">
+    <!-- Blue Cap -->
+    <rect x="38" y="15" width="24" height="16" rx="3" fill="#0284c7"/>
+
+    <!-- Neck -->
+    <rect x="42" y="31" width="16" height="20" fill="#38bdf8"/>
+
+    <!-- Bottle Body with Water Ribs -->
+    <path d="M 20 60 L 80 60 C 88 80, 88 210, 80 225 L 20 225 C 12 210, 12 80, 20 60 Z" fill="url(#mw-bottle)" opacity="0.85"/>
+
+    <!-- Label -->
+    <rect x="15" y="105" width="70" height="60" rx="4" fill="#ffffff"/>
+    <text x="50" y="132" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#0284c7" text-anchor="middle">PURE</text>
+    <text x="50" y="146" font-family="Arial, sans-serif" font-weight="bold" font-size="9" fill="#0369a1" text-anchor="middle">MINERAL WATER</text>
+
+    <!-- Water Drop Splash -->
+    <path d="M 50 178 C 44 188 44 196 50 198 C 56 196 56 188 50 178 Z" fill="#0284c7"/>
+
+    <text x="50" y="245" font-family="Arial, sans-serif" font-weight="bold" font-size="12" fill="#0369a1" text-anchor="middle">MINERAL WATER 500ml</text>
+  </g>
+</svg>

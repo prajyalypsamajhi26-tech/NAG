@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="frooti-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef9c3"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <linearGradient id="pack" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <filter id="frooti-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#a16207" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#frooti-bg)"/>
+
+  <g filter="url(#frooti-shadow)" transform="translate(130, 40)">
+    <!-- Green Straw -->
+    <path d="M 75 0 L 75 40 L 45 60" fill="none" stroke="#22c55e" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 75 0 L 75 40 L 45 60" fill="none" stroke="#15803d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Drink Carton -->
+    <rect x="25" y="45" width="90" height="170" rx="10" fill="url(#pack)"/>
+    <polygon points="25,45 70,25 115,45" fill="#a16207"/>
+
+    <!-- White Brand Box -->
+    <rect x="33" y="70" width="74" height="115" rx="8" fill="#ffffff"/>
+
+    <text x="70" y="102" font-family="Impact, Arial Black, sans-serif" font-size="24" fill="#eab308" text-anchor="middle">MANGO</text>
+    <text x="70" y="128" font-family="Impact, Arial Black, sans-serif" font-size="26" fill="#15803d" text-anchor="middle">FROOTI</text>
+
+    <!-- Mango Fruit Graphic -->
+    <path d="M 70 138 C 50 138 45 155 58 170 C 75 180 90 165 85 148 C 82 140 76 138 70 138 Z" fill="#f97316"/>
+    <path d="M 70 138 Q 65 130 75 132" fill="none" stroke="#15803d" stroke-width="3"/>
+
+    <text x="70" y="235" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#ca8a04" text-anchor="middle">MANGO FROOTI 200ml</text>
+  </g>
+</svg>

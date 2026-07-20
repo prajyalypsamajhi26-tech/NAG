@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cotton-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="cotton-roll" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <filter id="cotton-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#64748b" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#cotton-bg)"/>
+
+  <g filter="url(#cotton-shadow)" transform="translate(100, 60)">
+    <!-- Soft Cotton Puff Shapes behind -->
+    <circle cx="100" cy="90" r="45" fill="url(#cotton-roll)"/>
+    <circle cx="140" cy="80" r="40" fill="url(#cotton-roll)"/>
+    <circle cx="70" cy="110" r="35" fill="url(#cotton-roll)"/>
+    <circle cx="120" cy="120" r="42" fill="url(#cotton-roll)"/>
+
+    <!-- Paper Wrapper Roll -->
+    <rect x="40" y="70" width="120" height="90" rx="10" fill="#0284c7" opacity="0.9"/>
+
+    <!-- Medical Cross Badge -->
+    <circle cx="100" cy="115" r="22" fill="#ffffff"/>
+    <path d="M 100 102 L 100 128 M 87 115 L 113 115" stroke="#ef4444" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Blue Text Band -->
+    <rect x="40" y="140" width="120" height="20" fill="#0369a1"/>
+    <text x="100" y="154" font-family="Arial, sans-serif" font-weight="bold" font-size="10" fill="#ffffff" text-anchor="middle">SURGICAL COTTON 50g</text>
+  </g>
+</svg>

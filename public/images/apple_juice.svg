@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="aj-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef2f2"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </linearGradient>
+    <linearGradient id="aj-liq" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="aj-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#dc2626" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#aj-bg)"/>
+
+  <g filter="url(#aj-shadow)" transform="translate(130, 45)">
+    <!-- Glass Container -->
+    <path d="M 30 30 L 110 30 L 96 190 C 96 200, 44 200, 44 190 Z" fill="#ffffff" opacity="0.5" stroke="#f59e0b" stroke-width="2"/>
+
+    <!-- Juice Liquid -->
+    <path d="M 32 50 L 108 50 L 95 186 C 95 194, 45 194, 45 186 Z" fill="url(#aj-liq)"/>
+
+    <!-- Red Apple Slice on Rim -->
+    <path d="M 30 25 C 10 25 10 55 30 55 C 50 55 50 25 30 25 Z" fill="#ef4444"/>
+    <path d="M 30 29 C 16 29 16 51 30 51 Z" fill="#fef08a"/>
+    <!-- Stem & Leaf -->
+    <path d="M 30 25 Q 35 15 40 10" fill="none" stroke="#78350f" stroke-width="2"/>
+    <path d="M 40 10 Q 50 8 48 18 Z" fill="#22c55e"/>
+
+    <text x="70" y="222" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#b91c1c" text-anchor="middle">APPLE JUICE 200ml</text>
+  </g>
+</svg>

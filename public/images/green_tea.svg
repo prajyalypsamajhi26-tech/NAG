@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gt-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="cup-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="gt-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#15803d" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#gt-bg)"/>
+
+  <!-- Tea Cup and Saucer -->
+  <g filter="url(#gt-shadow)" transform="translate(110, 70)">
+    <!-- Saucer -->
+    <ellipse cx="90" cy="140" rx="90" ry="22" fill="#e2e8f0"/>
+    <ellipse cx="90" cy="138" rx="85" ry="18" fill="#ffffff"/>
+
+    <!-- Handle -->
+    <path d="M 155 50 C 185 50 185 100 150 100" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 155 50 C 180 50 180 100 150 100" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Cup Body -->
+    <path d="M 25 30 L 155 30 C 155 95, 135 125, 90 125 C 45 125, 25 95, 25 30 Z" fill="url(#cup-grad)"/>
+
+    <!-- Tea Liquid Surface -->
+    <ellipse cx="90" cy="30" rx="63" ry="12" fill="#84cc16"/>
+    <ellipse cx="90" cy="31" rx="56" ry="9" fill="#65a30d"/>
+
+    <!-- Tea Bag String & Tag -->
+    <path d="M 110 32 Q 130 50 140 80 Q 145 100 155 120" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="3,3"/>
+    <rect x="145" y="115" width="22" height="28" rx="3" fill="#22c55e" transform="rotate(15, 145, 115)"/>
+    <text x="156" y="132" font-family="Arial, sans-serif" font-weight="bold" font-size="8" fill="#ffffff" text-anchor="middle" transform="rotate(15, 145, 115)">TEA</text>
+
+    <!-- Green Tea Leaf Icon -->
+    <path d="M 80 28 C 70 18, 90 12, 100 28 C 90 32, 85 32, 80 28 Z" fill="#4d7c0f"/>
+
+    <text x="90" y="175" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#15803d" text-anchor="middle">GREEN TEA (10 Bags)</text>
+  </g>
+</svg>

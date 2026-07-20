@@ -422,19 +422,10 @@
     .exp-icon{font-size:52px;margin-bottom:16px}
     .exp-title{font-size:22px;font-weight:900;color:#ef4444;margin-bottom:8px}
     .exp-sub{font-size:14px;color:#888}
-
-    /* toast */
-    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);
-      background:rgba(20,20,20,.9);color:#fff;padding:11px 22px;
-      border-radius:50px;font-size:14px;font-weight:700;z-index:9999;
-      white-space:nowrap;animation:tUp .2s ease}
-    @keyframes tUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
->>>>>>> 3080315ea0c6a9dd5c9f21f83b4a0a8e77d00062
   </style>
 </head>
 <body>
 
-<<<<<<< HEAD
   <!-- Nav Screen -->
   <div id="nav-screen" class="screen active">
 
@@ -811,38 +802,6 @@
             audio.play();
             playing = true;
             vbar.classList.add('playing');
-            audio.onended = () => { playing = false; vbar.classList.remove('playing'); };
-          }
-        };
-      }
-
-      // Progress Dots
-      const dotsEl = document.getElementById('dots');
-      dotsEl.innerHTML = steps.map((_, i) => `<div class="dot" id="d${i}"></div>`).join('');
-
-      // Buttons
-      document.getElementById('prev-btn').onclick = () => { if (cur > 0) { cur--; render(); } };
-      document.getElementById('next-btn').onclick = advance;
-      document.getElementById('done-btn').onclick = advance;
-
-      // Quick Actions
-      document.getElementById('near-btn').onclick = () => {
-        const phone = DATA.phone || '';
-        const body = encodeURIComponent("Hi! I'm your DoorPilot delivery executive — I'm almost at your door!");
-        window.open(`sms:${phone}?body=${body}`);
-        toast('📍 Pre-filled SMS ready to send to customer');
-      };
-
-      document.getElementById('wrong-btn').onclick = () => {
-        openSheet(`Issue at Step ${cur + 1} (${steps[cur].name}): `);
-      };
-
-      document.getElementById('msg-bell-btn').onclick = () => openSheet();
-      document.getElementById('sheet-close-btn').onclick = closeSheet;
-      document.getElementById('sheet-overlay').onclick = closeSheet;
-
-      document.querySelectorAll('.quick-chip').forEach(chip => {
-        chip.onclick = () => sendDispatchMsg(chip.dataset.msg);
       });
 
       document.getElementById('msg-send-btn').onclick = () => {

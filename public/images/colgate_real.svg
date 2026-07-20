@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="colg-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fee2e2"/>
+    </radialGradient>
+    <linearGradient id="colg-red" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <filter id="shadow-3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="4" dy="12" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#colg-bg)"/>
+  <ellipse cx="200" cy="240" rx="90" ry="14" fill="#0f172a" opacity="0.15"/>
+
+  <g filter="url(#shadow-3d)" transform="translate(100, 65)">
+    <!-- Toothpaste Box -->
+    <rect x="0" y="0" width="200" height="130" rx="16" fill="url(#colg-red)"/>
+    <path d="M 0 0 L 200 0 L 200 35 L 0 35 Z" fill="#ffffff"/>
+
+    <text x="100" y="26" font-family="'Impact', 'Arial Black', sans-serif" font-weight="900" font-size="24" fill="#b91c1c" text-anchor="middle">Colgate</text>
+
+    <text x="100" y="70" font-family="'Arial Black', sans-serif" font-weight="900" font-size="16" fill="#38bdf8" text-anchor="middle">MAXFRESH</text>
+    <text x="100" y="92" font-family="Arial, sans-serif" font-weight="800" font-size="11" fill="#fde047" text-anchor="middle">COOLING CRYSTALS</text>
+    <text x="100" y="112" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#ffffff" text-anchor="middle">RED GEL • 150g</text>
+  </g>
+</svg>

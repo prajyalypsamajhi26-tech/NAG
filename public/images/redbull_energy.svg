@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rb-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="can-silver" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="50%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <filter id="rb-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#0284c7" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#rb-bg)"/>
+
+  <g filter="url(#rb-shadow)" transform="translate(145, 30)">
+    <!-- Can Rim Top -->
+    <ellipse cx="50" cy="25" rx="30" ry="8" fill="#cbd5e1"/>
+
+    <!-- Can Body -->
+    <rect x="20" y="25" width="60" height="185" fill="url(#can-silver)" rx="4"/>
+
+    <!-- Blue and Silver Diagonal Design -->
+    <polygon points="20,40 80,40 80,120 20,150" fill="#1e3a8a"/>
+    <polygon points="20,150 80,120 80,195 20,195" fill="#0284c7"/>
+
+    <!-- Yellow Sun emblem -->
+    <circle cx="50" cy="115" r="18" fill="#facc15"/>
+
+    <!-- Red Charging Bulls graphic outline -->
+    <path d="M 32 115 L 48 115 M 52 115 L 68 115" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+
+    <text x="50" y="80" font-family="Arial Black, sans-serif" font-weight="900" font-size="11" fill="#ffffff" text-anchor="middle">RED BULL</text>
+    <text x="50" y="165" font-family="Arial, sans-serif" font-weight="bold" font-size="9" fill="#facc15" text-anchor="middle">ENERGY DRINK</text>
+
+    <text x="50" y="235" font-family="Arial, sans-serif" font-weight="bold" font-size="12" fill="#38bdf8" text-anchor="middle">RED BULL 250ml</text>
+  </g>
+</svg>

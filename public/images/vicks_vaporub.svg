@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="vicks-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="100%" stop-color="#d1fae5"/>
+    </linearGradient>
+    <linearGradient id="vicks-jar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="vicks-lid" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <filter id="vicks-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#065f46" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" rx="16" fill="url(#vicks-bg)"/>
+
+  <g filter="url(#vicks-shadow)" transform="translate(130, 50)">
+    <!-- Blue Lid -->
+    <rect x="10" y="20" width="120" height="30" rx="6" fill="url(#vicks-lid)"/>
+    <!-- Lid Ridges -->
+    <line x1="25" y1="20" x2="25" y2="50" stroke="#0284c7" stroke-width="2"/>
+    <line x1="45" y1="20" x2="45" y2="50" stroke="#0284c7" stroke-width="2"/>
+    <line x1="65" y1="20" x2="65" y2="50" stroke="#0284c7" stroke-width="2"/>
+    <line x1="85" y1="20" x2="85" y2="50" stroke="#0284c7" stroke-width="2"/>
+    <line x1="105" y1="20" x2="105" y2="50" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- Green Jar Tub -->
+    <path d="M 15 50 L 125 50 L 118 160 C 118 172, 22 172, 22 160 Z" fill="url(#vicks-jar)"/>
+
+    <!-- Green Label -->
+    <rect x="22" y="70" width="96" height="75" rx="8" fill="#10b981"/>
+
+    <!-- Triangle Logo on Label -->
+    <polygon points="70,80 45,115 95,115" fill="#facc15"/>
+    <text x="70" y="105" font-family="Arial, sans-serif" font-weight="900" font-size="12" fill="#047857" text-anchor="middle">VICKS</text>
+
+    <text x="70" y="128" font-family="Arial, sans-serif" font-weight="bold" font-size="10" fill="#ffffff" text-anchor="middle">VapoRub</text>
+    <text x="70" y="140" font-family="Arial, sans-serif" font-size="8" fill="#ecfdf5" text-anchor="middle">Relief Ointment 25g</text>
+  </g>
+</svg>
